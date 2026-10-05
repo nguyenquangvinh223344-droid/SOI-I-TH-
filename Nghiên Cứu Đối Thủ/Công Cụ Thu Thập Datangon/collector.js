@@ -110,6 +110,7 @@
         height: Math.round(rect.height),
         viewBox: svg.getAttribute("viewBox") || "",
         points: line.points.map((p) => [Math.round(p[0] * 100) / 100, Math.round(p[1] * 100) / 100]),
+        linePath: line.d,
         rawPaths: paths.map((p) => p.d).slice(0, 3),
       });
     });
@@ -232,11 +233,13 @@
       hoa_hong_pct: parsePct(hhRaw),
       trend_don_ys: ys(spark[0]),
       trend_video_ys: ys(spark[1]),
+      trend_don_path: spark[0] ? spark[0].linePath : "",
+      trend_video_path: spark[1] ? spark[1].linePath : "",
       so_duong_bieu_do: spark.length,
       spark_info: spark.map((s) => ({ w: s.width, h: s.height, viewBox: s.viewBox })),
       anh: img ? img.src : "",
       van_ban_dong: text,
-      html_goc: row.outerHTML.slice(0, 6000), // để mình sửa lỗi nếu đọc sai
+      html_goc: row.outerHTML.slice(0, 20000), // bản chép nguyên văn của dòng: nếu sau này thiếu gì, đọc lại từ đây, khỏi đi lại ngách
     };
   }
 
@@ -273,7 +276,8 @@
       const r = parseRow(row);
       if (r.locked) { locked++; continue; }
       if (!r.nhan) { bad++; continue; }
-      const key = [info.nganh_hang, info.nganh_hang_chi_tiet, r.nhan, r.id_sp || r.anh || r.ten_sp].join("||");
+      const day = new Date().toISOString().slice(0, 10);
+      const key = [day, info.nganh_hang, info.nganh_hang_chi_tiet, r.nhan, r.id_sp || r.anh || r.ten_sp].join("||");
       all[key] = Object.assign({ thoi_gian: new Date().toISOString(), url: location.href }, info, r);
       saved++;
     }

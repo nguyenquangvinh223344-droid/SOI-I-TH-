@@ -12,6 +12,13 @@ Bạn KHÔNG cần bấm vào link sản phẩm, nó tự chép link giúp.
 Nó KHÔNG tự đi lung tung. Bạn bấm sang ngách nào, nó chép ngách đó.
 
 
+CẬP NHẬT LÊN BẢN MỚI (nếu đã cài bản cũ)
+1. Làm lại Phần 1 (tải zip, giải nén). Chép đè các file trong thư mục
+   "Công Cụ Thu Thập Datangon" cũ, hoặc chọn thư mục mới ở bước dưới.
+2. Vào chrome://extensions, bấm nút mũi tên xoay tròn ở "Thu Thập Mẫu Datangon".
+   Nếu bạn chọn thư mục mới thì xoá bản cũ, rồi làm lại Phần 2.
+3. Vào Datangon bấm F5. Mẫu đã ghi trước đó vẫn còn nguyên.
+
 PHẦN 1: LẤY NÓ VỀ MÁY (làm 1 lần)
 1. Mở link này trong Chrome:
    https://github.com/nguyenquangvinh223344-droid/SOI-I-TH-/archive/refs/heads/claude/kind-davinci-e2gf50.zip
@@ -52,9 +59,12 @@ Cách bấm tay (nếu không muốn tự ghi):
 
 
 PHẦN 4: LẤY BẢNG VỀ
-Khi đi xong, bấm nút "Tải CSV" trong khung đen. Máy tải về file
-datangon-mau.csv (mở bằng Excel được). Gửi file đó cho Claude.
-(Có thể bấm thêm "Tải JSON" và gửi luôn, để có đủ đường biểu đồ.)
+Khi đi xong, bấm CẢ HAI nút trong khung đen:
+- "Tải CSV": ra file datangon-mau-de-doc.csv (mở bằng Excel, cột tiếng Việt dễ đọc).
+- "Tải JSON": ra file datangon-mau.json. QUAN TRỌNG, đừng bỏ qua: file này giữ
+  bản chép nguyên văn của từng dòng. Nếu sau này thiếu thứ gì, Claude đọc lại từ
+  file này, bạn KHÔNG phải đi lại các ngách.
+Gửi cả hai file cho Claude.
 
 
 NẾU GẶP CHUYỆN LẠ

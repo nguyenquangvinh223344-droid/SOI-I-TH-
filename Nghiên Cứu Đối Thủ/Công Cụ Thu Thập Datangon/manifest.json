@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Thu Thập Mẫu Datangon",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Ghi lại các dòng sản phẩm đang hiện trên Datangon (khi bạn bấm nút) để phân tích công thức gắn nhãn.",
-  "permissions": ["storage"],
+  "permissions": ["storage", "unlimitedStorage"],
   "content_scripts": [
     {
       "matches": ["https://datangon.com/*", "https://www.datangon.com/*"],
