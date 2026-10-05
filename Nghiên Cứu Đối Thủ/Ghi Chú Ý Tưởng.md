@@ -60,3 +60,15 @@ Dữ liệu điện thoại đã thấy: Vào ngay có 111-184 creator/7 ngày, 
 
 Kế hoạch thu thập (người dùng chốt): không bấm 5 nhãn; đi từng ngành lớn -> từng ngách con,
 mỗi ngách chép 3 dòng mở (Vào ngay, Đang hot, Né ra). Quét hết một vòng trong ~30 phút.
+
+Bổ sung tooltip (ảnh gửi thêm):
+- Trend video: biểu đồ SỐ LƯỢNG video mới gắn sản phẩm theo thời gian, trong 90 ngày.
+- GMV 30N: tổng doanh thu bán ra 30 ngày gần nhất, đo trên các video viral, KHÔNG có live
+  và mua trực tiếp qua product showcase. (Khác "doanh thu tổng" của Kalodata.)
+- %HH: % hoa hồng affiliate creator nhận cho mỗi đơn qua link gắn sản phẩm. Càng cao càng đáng làm nội dung.
+- Chưa có tooltip của cột "Đơn 30N" (cần chụp thêm).
+
+Ý nghĩa: các cột Datangon hiện (video mới %, trend video) đo mức tham gia làm video, tức là
+một cách đo cạnh tranh nhìn thấy được; có thể nhãn tính từ chúng, không cần số creator.
+Vẫn còn chưa giải thích: con dép Vào ngay, Datangon GMV 1,2 tỷ nhưng Kalodata doanh thu
+từ video chỉ 590K (30 ngày).
