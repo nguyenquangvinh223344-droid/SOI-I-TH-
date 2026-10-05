@@ -41,3 +41,22 @@ Cột mỗi sản phẩm: đơn 30 ngày (kèm mũi tên), đã bán, xu hướn
 Chưa biết: công thức gắn nhãn, nguồn dữ liệu, cách thu thập, giá gói. Các ngưỡng nhãn do công cụ AI khác đưa ra không khớp ảnh thật, không dùng làm sự thật. Ngưỡng nhãn nên đặt trong file cấu hình để chỉnh được.
 
 Đối sánh: Datangon mạnh ở cấp sản phẩm; công cụ của mình mạnh ở cấp kênh và video, theo dõi tăng trưởng.
+
+## C. Định nghĩa chính thức Datangon tự ghi (tooltip, ảnh người dùng chụp 05/10/2026)
+
+- Xu hướng: "Nhãn đánh giá cơ hội của sản phẩm dựa trên dữ liệu bán thật:
+  Vào ngay (cơ hội mới mở, ít người bán) · Đang hot (bán chạy nhưng cạnh tranh cao) ·
+  Né ra (quá nhiều người bán, lãi/creator đã mỏng) · Theo dõi (ổn định, chưa rõ tăng/giảm) ·
+  Đang giảm (đang ế)."
+- Đã bán: tổng cộng dồn từ khi lên sàn (trọn đời), KHÁC "đơn 30n" (chỉ 30 ngày gần đây).
+- Trend đơn: biểu đồ tốc độ bán theo thời gian, từ ~90 ngày trước. (Trend video cũng 90 ngày.)
+- Video mới: % video gắn sản phẩm đăng trong 30 ngày qua trên tổng số video từ trước tới nay.
+  Cao = creator đang tích cực làm nội dung mới.
+
+Hệ quả cho việc tìm công thức: nhãn dựa vào MỨC CẠNH TRANH (số người bán / số creator) và
+LÃI TRÊN MỖI CREATOR, nhưng Datangon KHÔNG hiện hai số đó. Cần lấy số nhà sáng tạo từ
+nguồn khác (điện thoại TikTok Shop, Tiktoday, Kalodata) cho cùng sản phẩm để thử.
+Dữ liệu điện thoại đã thấy: Vào ngay có 111-184 creator/7 ngày, Đang hot có 23,9K.
+
+Kế hoạch thu thập (người dùng chốt): không bấm 5 nhãn; đi từng ngành lớn -> từng ngách con,
+mỗi ngách chép 3 dòng mở (Vào ngay, Đang hot, Né ra). Quét hết một vòng trong ~30 phút.
