@@ -282,16 +282,64 @@
   }
 
   // ------------------------------------------------------------- xuất
-  const CSV_COLS = [
-    "thoi_gian", "nganh_hang", "nganh_hang_chi_tiet", "nhan", "id_sp", "link_sp", "ten_sp", "sao", "so_danh_gia_raw",
-    "don30n_raw", "don30n", "mui_ten", "da_ban_raw", "da_ban", "video_moi_pct", "gmv30n_raw",
-    "gmv30n_vnd", "hoa_hong_raw", "hoa_hong_pct", "trend_don_ys", "trend_video_ys",
-    "so_duong_bieu_do", "tong_sp_ngach", "cap_nhat_tren_trang", "url",
-  ];
+  // ---- Bảng Excel dễ đọc: cột tiếng Việt, đường biểu đồ đổi thành điểm 0-100
+  // (100 = cao nhất trên biểu đồ) đọc từ TRÁI (cũ) sang PHẢI (mới).
+  function scoresOf(ysStr, h) {
+    if (!ysStr) return [];
+    const H = h || 24;
+    return String(ysStr).split(";").map(Number).map((y) => Math.max(0, Math.min(100, Math.round((1 - y / H) * 100))));
+  }
+  function trendWord(sc) {
+    if (sc.length < 2) return "";
+    const first = sc[0], last = sc[sc.length - 1], prev = sc[sc.length - 2];
+    const mn = Math.min(...sc), mx = Math.max(...sc);
+    const mi = sc.indexOf(mn), xi = sc.indexOf(mx);
+    let w = last - first >= 15 ? "Đi lên" : last - first <= -15 ? "Đi xuống" : "Đi ngang";
+    if (mi > 0 && mi < sc.length - 1 && last - mn >= 25 && first - mn >= 25) w = "Sụt rồi bật lên";
+    else if (xi > 0 && xi < sc.length - 1 && mx - last >= 25 && mx - first >= 25) w = "Lên rồi sụt";
+    const recent = last - prev >= 8 ? " (gần đây tăng)" : last - prev <= -8 ? " (gần đây giảm)" : "";
+    return w + recent;
+  }
   function csvCell(v) {
     if (v == null) return "";
     const s = String(v);
     return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  const ORDER = { "Vào ngay": 1, "Đang hot": 2, "Né ra": 3, "Theo dõi": 4, "Đang giảm": 5 };
+  function readableRows(all) {
+    const sorted = all.slice().sort((a, b) =>
+      (a.nganh_hang + a.nganh_hang_chi_tiet).localeCompare(b.nganh_hang + b.nganh_hang_chi_tiet, "vi") ||
+      (ORDER[a.nhan] || 9) - (ORDER[b.nhan] || 9));
+    return sorted.map((r) => {
+      const hD = r.spark_info && r.spark_info[0] ? r.spark_info[0].h : 24;
+      const hV = r.spark_info && r.spark_info[1] ? r.spark_info[1].h : 24;
+      const sD = scoresOf(r.trend_don_ys, hD), sV = scoresOf(r.trend_video_ys, hV);
+      return {
+        "Ngành lớn": r.nganh_hang,
+        "Ngách con": r.nganh_hang_chi_tiet,
+        "Nhãn": r.nhan,
+        "Tên sản phẩm (bị che)": r.ten_sp,
+        "Đơn 30N": r.don30n,
+        "Đơn đang": (r.mui_ten || "").replace("(màu)", ""),
+        "Đã bán (trọn đời)": r.da_ban,
+        "Video mới 30N (%)": r.video_moi_pct,
+        "GMV 30N (triệu đồng)": r.gmv30n_vnd == null ? "" : Math.round(r.gmv30n_vnd / 1e6),
+        "Hoa hồng (%)": r.hoa_hong_pct == null ? "" : r.hoa_hong_pct,
+        "Trend đơn 90 ngày": trendWord(sD),
+        "Trend đơn (điểm 0-100, trái=cũ, phải=mới)": sD.join(" > "),
+        "Trend video 90 ngày": trendWord(sV),
+        "Trend video (điểm 0-100, trái=cũ, phải=mới)": sV.join(" > "),
+        "Link sản phẩm": r.link_sp,
+        "Mã sản phẩm": r.id_sp ? "'" + r.id_sp : "",
+        "Thời gian ghi": (r.thoi_gian || "").replace("T", " ").slice(0, 16),
+      };
+    });
+  }
+  function buildCsv(all) {
+    const rows = readableRows(all);
+    if (!rows.length) return "";
+    const cols = Object.keys(rows[0]);
+    return [cols.map(csvCell).join(",")].concat(rows.map((r) => cols.map((c) => csvCell(r[c])).join(","))).join("\n");
   }
   function download(name, text, type) {
     const blob = new Blob([text], { type });
@@ -304,14 +352,7 @@
   }
   async function exportCsv() {
     const all = Object.values(await loadAll());
-    const lines = [CSV_COLS.join(",")];
-    for (const r of all) {
-      const flat = Object.assign({}, r, {
-        dem_theo_nhan: undefined,
-      });
-      lines.push(CSV_COLS.map((c) => csvCell(flat[c])).join(","));
-    }
-    download("datangon-mau.csv", "\ufeff" + lines.join("\n"), "text/csv;charset=utf-8");
+    download("datangon-mau-de-doc.csv", "\ufeff" + buildCsv(all), "text/csv;charset=utf-8");
   }
   async function exportJson() {
     download("datangon-mau.json", JSON.stringify(Object.values(await loadAll()), null, 2), "application/json");
@@ -408,5 +449,5 @@
   else document.addEventListener("DOMContentLoaded", buildPanel);
 
   // để chạy thử tự động
-  window.__dgTest = { findRows, parseRow, pageInfo, record, parseCompact, pathPoints, loadAll };
+  window.__dgTest = { buildCsv, readableRows, findRows, parseRow, pageInfo, record, parseCompact, pathPoints, loadAll };
 })();
