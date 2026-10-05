@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>Quangg Ving Scanner Pro - Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Quangg Ving <span class="accent-orange">Scanner</span> <span class="accent-orange">Pro</span></h1>
+    <div class="topbar-right">
+      <div class="updated-at" id="updatedAt">Cập nhật: --:--:--</div>
+      <button id="btnBackupNow" class="btn btn-ghost btn-sm">Sao lưu ngay</button>
+      <button id="btnImportBackup" class="btn btn-ghost btn-sm">Nhập file sao lưu</button>
+      <input type="file" id="importFileInput" accept="application/json" style="display:none;" />
+      <button id="btnTrash" class="btn-trash" title="Thùng rác">🗑️<span id="trashCount" class="trash-count" style="display:none;">0</span></button>
+      <button id="btnThemeToggle" class="theme-toggle" title="Đổi sáng/tối">🌙</button>
+    </div>
+  </header>
+  <div class="subtitle">Theo dõi từng clip qua tối đa 4 lần quét gần nhất mà chính clip đó xuất hiện.</div>
+
+  <section class="filters">
+    <div class="filter-field">
+      <label>BÁO CÁO THEO KÊNH</label>
+      <select id="filterChannel">
+        <option value="">Tất cả kênh</option>
+      </select>
+    </div>
+    <div class="filter-field">
+      <label>SẮP XẾP</label>
+      <select id="sortBy">
+        <option value="viewsPerDay">Tốc độ tăng/ngày</option>
+        <option value="followerRatio">Đột biến so với follower</option>
+        <option value="gain">Tăng view cao nhất</option>
+        <option value="views">Lượt view cao nhất</option>
+        <option value="newest">Ngày đăng mới nhất</option>
+      </select>
+    </div>
+    <div class="filter-field">
+      <label>XU HƯỚNG</label>
+      <select id="filterTrend">
+        <option value="">Tất cả</option>
+        <option value="🔥">🔥 Đang bùng nổ</option>
+        <option value="📈">📈 Đang tăng đều</option>
+        <option value="📉">📉 Đang chững</option>
+        <option value="🆕">🆕 Mới, chưa đủ dữ liệu</option>
+      </select>
+    </div>
+    <button id="btnHelp" class="btn-trash" title="Giải thích các bộ lọc">📖</button>
+    <button id="btnExportExcel" class="btn btn-orange">Xuất Excel</button>
+  </section>
+
+  <section class="metrics">
+    <div class="metric-card">
+      <div class="metric-label">CLIP ĐẠT NGƯỠNG</div>
+      <div class="metric-value" id="mClipCount">0</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">SỐ KÊNH CÓ KẾT QUẢ</div>
+      <div class="metric-value" id="mChannelCount">0</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">TỔNG VIEW HIỆN TẠI</div>
+      <div class="metric-value accent-orange" id="mTotalViews">0</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">VIEW TĂNG LẦN GẦN NHẤT</div>
+      <div class="metric-value accent-pink" id="mLastGain">+0</div>
+    </div>
+  </section>
+
+  <div class="note-card">
+    Lịch sử quét/clip: tool lưu lại toàn bộ các lần quét, không xoá gì cả. Cột LẦN ĐẦU là mốc cố định từ lần đầu tiên
+    phát hiện video (không bao giờ đổi), cột LẦN 1-4 là 4 lần quét gần nhất (tự cập nhật dần khi quét thêm).
+    Nếu clip mới xuất hiện thì các lần trước để trống ("— Chưa có") là đúng.
+    <br />
+    VIEW/NGÀY = (views mới nhất − views lần quét đầu tiên) / số giờ giữa 2 lần đó × 24
+  </div>
+
+  <div id="bulkActionBar" class="bulk-action-bar" style="display:none;">
+    <span>Đã chọn <b id="bulkCount">0</b> dòng</span>
+    <button id="bulkDeleteSelected" class="btn btn-pink btn-sm">✕ Xoá tất cả vào thùng rác</button>
+    <button id="bulkClearSelection" class="btn btn-ghost btn-sm">Bỏ chọn</button>
+  </div>
+
+  <section class="table-wrap">
+    <div class="table-head-row">
+      <span class="fire">🔥 Báo cáo clip</span>
+      <span class="table-sub">Không còn viền tròn L1/L2/L3. Mỗi lần quét là một cột cố định, dễ so sánh.</span>
+    </div>
+    <table id="videoTable">
+      <thead>
+        <tr>
+          <th>KÊNH</th>
+          <th>NGÀY ĐĂNG</th>
+          <th>VIEW HIỆN TẠI</th>
+          <th>TĂNG</th>
+          <th>VIEW/NGÀY</th>
+          <th>LẦN ĐẦU</th>
+          <th>LẦN 1</th>
+          <th>LẦN 2</th>
+          <th>LẦN 3</th>
+          <th>LẦN 4</th>
+          <th>XU HƯỚNG</th>
+          <th>LINK CLIP</th>
+          <th>XEM</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="videoTableBody"></tbody>
+    </table>
+    <div id="emptyState" class="empty-state" style="display:none;">Chưa có dữ liệu — mở popup và bấm "Bắt đầu quét" trước.</div>
+  </section>
+
+  <div id="trashModal" class="qr-overlay" style="display:none;">
+    <div class="trash-box">
+      <button id="trashModalClose" class="qr-close">✕</button>
+      <div class="trash-head-row">
+        <div class="qr-title">Thùng rác</div>
+        <div class="trash-bulk-actions">
+          <button id="btnRestoreAll" class="btn btn-orange btn-sm">Khôi phục tất cả</button>
+          <button id="btnDeleteAll" class="btn btn-ghost btn-sm">Xoá vĩnh viễn tất cả</button>
+        </div>
+      </div>
+      <table class="trash-table">
+        <thead>
+          <tr><th>Kênh</th><th>Ngày đăng</th><th>View</th><th>Đã xoá lúc</th><th></th></tr>
+        </thead>
+        <tbody id="trashTableBody"></tbody>
+      </table>
+      <div id="trashEmpty" class="empty-state" style="display:none;">Thùng rác trống.</div>
+    </div>
+  </div>
+
+  <div id="helpModal" class="qr-overlay" style="display:none;">
+    <div class="help-box">
+      <button id="helpModalClose" class="qr-close">✕</button>
+      <div class="qr-title">Ý nghĩa các bộ lọc</div>
+
+      <div class="help-section-title">📊 Sắp xếp (xếp theo mức hữu ích giảm dần)</div>
+      <table class="help-table">
+        <tbody>
+          <tr><td><b>1. Tốc độ tăng/ngày</b></td><td>Tốc độ tăng view trung bình mỗi ngày, đã quy đổi công bằng theo thời gian — cách chính xác nhất để biết video nào đang thực sự "nóng" ngay lúc này.</td></tr>
+          <tr><td><b>2. Đột biến so với follower</b></td><td>So view hiện tại với follower của chính kênh đó. Kênh nhỏ (vd 1.000 follower) mà video đạt 50.000 view là đột biến thật — đáng chú ý hơn nhiều so với kênh to mà view chỉ bằng vài % follower.</td></tr>
+          <tr><td><b>3. Tăng view cao nhất</b></td><td>Video tăng view nhiều nhất tính từ lần quét trước lên đầu. Lưu ý: không tính khoảng cách thời gian giữa 2 lần quét, nên đôi khi chưa phản ánh đúng ai đang "nóng" nhất.</td></tr>
+          <tr><td><b>4. Lượt view cao nhất</b></td><td>Video có tổng view nhiều nhất hiện tại lên đầu — dù đang tăng nhanh hay đã đứng yên lâu rồi.</td></tr>
+          <tr><td><b>5. Ngày đăng mới nhất</b></td><td>Video đăng gần đây nhất lên đầu, không liên quan view.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="help-section-title">🚦 Nhãn xu hướng</div>
+      <table class="help-table">
+        <tbody>
+          <tr><td>🔥 <b>Đang bùng nổ</b></td><td>Tốc độ tăng view đang nhanh dần lên so với lần quét trước — dấu hiệu rõ nhất của video sắp viral.</td></tr>
+          <tr><td>📈 <b>Đang tăng đều</b></td><td>Vẫn tăng view, tốc độ ổn định, chưa tăng tốc nhưng cũng chưa chậm lại.</td></tr>
+          <tr><td>📉 <b>Đang chững</b></td><td>Tốc độ tăng view đang chậm dần hoặc gần như đứng yên — có thể video đã qua đỉnh.</td></tr>
+          <tr><td>🆕 <b>Mới, chưa đủ dữ liệu</b></td><td>Mới quét 1 lần, cần quét thêm ít nhất 1 lần nữa mới biết xu hướng.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="qrModal" class="qr-overlay" style="display:none;">
+    <div class="qr-box">
+      <button id="qrModalClose" class="qr-close">✕</button>
+      <div class="qr-title">Quét mã để mở video trên điện thoại</div>
+      <img id="qrImage" class="qr-image" alt="QR code" />
+      <div id="qrLinkText" class="qr-link"></div>
+    </div>
+  </div>
+
+  <script src="libs/xlsx.full.min.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

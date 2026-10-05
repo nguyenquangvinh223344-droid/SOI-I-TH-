@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Quangg Ving Scanner Pro",
+  "version": "1.0.0",
+  "description": "Soi kênh TikTok tự động để tìm clip/sản phẩm win.",
+  "permissions": ["storage", "tabs", "scripting", "downloads", "alarms"],
+  "host_permissions": ["https://www.tiktok.com/*", "https://www.tikwm.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.tiktok.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Quangg Ving Scanner Pro"
+  }
+}

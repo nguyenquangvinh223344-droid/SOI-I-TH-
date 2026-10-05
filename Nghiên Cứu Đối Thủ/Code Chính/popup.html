@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>Quangg Ving Scanner Pro</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="title-row">
+        <h1>Quangg Ving <span class="accent-orange">Scanner</span> <span class="accent-orange">Pro</span></h1>
+        <div class="title-row-right">
+          <span class="chip chip-pink">DEMO MODE</span>
+          <button id="btnThemeToggle" class="theme-toggle" title="Đổi sáng/tối">🌙</button>
+        </div>
+      </div>
+      <div class="subtitle">TikTok winning-video scanner</div>
+    </header>
+
+    <div class="card card-license">
+      <div class="license-row">✓ License đang hoạt động</div>
+      <div class="license-row">Khách: <b>Khách trải nghiệm</b></div>
+      <div class="license-row">Lượt còn: <b id="licenseSlots">1/2</b></div>
+      <div class="license-row">Device ID: <span id="deviceId" class="mono">...</span></div>
+      <div class="license-row">Dùng thử đến: <b id="trialEnd">...</b></div>
+      <button id="btnCheckLicense" class="btn btn-ghost btn-sm">Kiểm tra trạng thái</button>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <label class="field-label">Danh sách kênh TikTok</label>
+        <span class="chip chip-dark" id="channelCount">0 kênh</span>
+      </div>
+      <textarea id="profileList" placeholder="https://www.tiktok.com/@username&#10;https://www.tiktok.com/@username2"></textarea>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label class="field-label">Từ ngày</label>
+        <input type="date" id="fromDate" />
+      </div>
+      <div class="field">
+        <label class="field-label">Đến ngày</label>
+        <input type="date" id="toDate" />
+      </div>
+    </div>
+
+    <div class="quick-dates">
+      <button type="button" class="chip-btn" data-days="7">7 ngày qua</button>
+      <button type="button" class="chip-btn" data-days="14">14 ngày qua</button>
+      <button type="button" class="chip-btn" data-days="30">30 ngày qua</button>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Ngưỡng lượt view <span id="thresholdSaved" class="saved-check" style="display:none;">✓ đã lưu</span></label>
+      <input type="number" id="threshold" value="10000" min="0" step="1000" />
+    </div>
+
+    <div class="field">
+      <label class="field-label">Tự quét lại mỗi</label>
+      <select id="autoRescan">
+        <option value="0">Không tự quét lại</option>
+        <option value="3">3 giờ</option>
+        <option value="6">6 giờ</option>
+        <option value="12">12 giờ</option>
+        <option value="24">24 giờ</option>
+      </select>
+    </div>
+
+    <div class="btn-row">
+      <button id="btnStart" class="btn btn-orange">Bắt đầu quét</button>
+      <button id="btnStop" class="btn btn-darkred">Dừng</button>
+    </div>
+    <div class="btn-row">
+      <button id="btnDashboard" class="btn btn-ghost">Dashboard</button>
+      <button id="btnExport" class="btn btn-ghost">Xuất Excel</button>
+    </div>
+
+    <div class="note">Không giới hạn số kênh theo gói. Các kênh được xếp hạng và quét tuần tự.</div>
+
+    <div class="progress-wrap">
+      <div class="stat-boxes">
+        <div class="stat-box">
+          <div class="stat-value" id="countRead">0</div>
+          <div class="stat-label">VIDEO ĐÃ ĐỌC</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value accent-orange" id="countMatched">0</div>
+          <div class="stat-label">CLIP ĐẠT</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value accent-red" id="countError">0</div>
+          <div class="stat-label">LỖI</div>
+        </div>
+      </div>
+
+      <div class="progress-row">
+        <span id="channelProgress">0/0 kênh</span>
+        <span class="deep-scan">Deep Scan</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div id="progressBar" class="progress-bar-fill"></div>
+      </div>
+      <div id="progressText" class="progress-text">Sẵn sàng.</div>
+      <div id="captchaBox" class="captcha-box" style="display:none;">
+        ⚠️ Cần xử lý captcha rồi bấm "Bắt đầu quét" lại.
+      </div>
+      <div id="healthWarningBox" class="captcha-box" style="display:none;">
+        ⚠️ Nhiều kênh cùng lúc không đọc được - TikTok có thể đã đổi giao diện, cần nhờ Claude kiểm tra lại code.
+      </div>
+      <div id="errorText" class="error-text"></div>
+    </div>
+
+    <div class="footnote">Chờ 15 giây sau khi vào mỗi kênh để TikTok render đủ lượt view.</div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
