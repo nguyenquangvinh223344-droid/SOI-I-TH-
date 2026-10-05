@@ -1,0 +1,37 @@
+CÔNG CỤ THU THẬP MẪU DATANGON
+=============================
+
+Công cụ này để làm gì
+- Khi bạn mở một ngách trên Datangon và bấm nút "Ghi lại", nó chép các dòng
+  sản phẩm đang hiện trên màn hình (nhãn, đơn 30N, đã bán, video mới, GMV,
+  hoa hồng, và hai đường biểu đồ nhỏ) vào một bảng.
+- Nó KHÔNG tự lướt, KHÔNG tự bấm gì. Chỉ chép những gì bạn đang thấy.
+- Dòng bị khoá (mờ, có chữ "Khoá") thì bỏ qua.
+
+Cài vào Chrome (làm một lần)
+1. Mở Chrome, gõ vào thanh địa chỉ:  chrome://extensions
+2. Bật "Chế độ dành cho nhà phát triển" (góc phải trên).
+3. Bấm "Tải tiện ích đã giải nén" và chọn thư mục "Công Cụ Thu Thập Datangon".
+4. Vào datangon.com, tải lại trang (F5). Sẽ có khung nhỏ màu đen ở góc phải
+   dưới màn hình.
+
+Cách dùng
+1. Vào một ngách con trên Datangon (ví dụ Thời trang nữ > Giày nữ).
+2. Chờ bảng hiện đủ 3 dòng mở (Vào ngay, Đang hot, Né ra).
+3. Bấm "Ghi lại trang này". Khung sẽ báo: thấy bao nhiêu dòng, lưu bao nhiêu.
+4. Sang ngách tiếp theo, bấm lại. Mỗi ngách mất chừng nửa phút.
+5. Làm khoảng 100 ngách thì bấm "CSV" (mở bằng Excel) hoặc "JSON" để tải bảng
+   về, rồi gửi file cho Claude.
+
+Nếu khung báo "Không thấy dòng nào" hoặc số liệu nhìn sai
+- Bấm "Chẩn đoán", nó tải về một file nhỏ. Gửi file đó cho Claude để chỉnh
+  lại cách đọc. Lần chạy đầu có thể phải chỉnh một lần, vì Claude chưa nhìn
+  được bên trong trang Datangon thật.
+
+Ghi chú để đọc dữ liệu
+- Chữ "T" trong GMV (ví dụ 2.1T) đang được hiểu là TỶ. Cột gmv30n_raw giữ
+  nguyên chữ gốc để kiểm tra lại.
+- Cột trend_don_ys và trend_video_ys là các điểm của đường biểu đồ, tính theo
+  trục y của màn hình: SỐ NHỎ = Ở TRÊN = GIÁ TRỊ CAO. Đường đi từ trái sang phải
+  mà số giảm dần nghĩa là biểu đồ đang đi lên.
+- Dữ liệu lưu trong trình duyệt của bạn. Nút "Xoá hết mẫu đã lưu" xoá sạch.
