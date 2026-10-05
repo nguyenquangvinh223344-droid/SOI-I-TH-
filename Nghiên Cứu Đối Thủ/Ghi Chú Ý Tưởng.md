@@ -72,3 +72,5 @@ Bổ sung tooltip (ảnh gửi thêm):
 một cách đo cạnh tranh nhìn thấy được; có thể nhãn tính từ chúng, không cần số creator.
 Vẫn còn chưa giải thích: con dép Vào ngay, Datangon GMV 1,2 tỷ nhưng Kalodata doanh thu
 từ video chỉ 590K (30 ngày).
+
+- Đơn 30N (người dùng đọc lại từ tooltip): "Số đơn bán ra trong 30 ngày gần nhất". Mũi tên chưa được giải thích.
