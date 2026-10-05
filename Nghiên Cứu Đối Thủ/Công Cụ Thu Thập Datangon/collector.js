@@ -39,7 +39,7 @@
     const n = parseFloat(m[1].replace(/,/g, "."));
     if (isNaN(n)) return null;
     const mult = { K: 1e3, M: 1e6, B: 1e9, T: 1e9 }[m[2].toUpperCase()] || 1;
-    return n * mult;
+    return Math.round(n * mult);
   }
   function parsePct(s) {
     if (s == null) return null;
