@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Đọc Tiktoday - Tìm Sản Phẩm Win",
+  "version": "0.1.0",
+  "description": "Đọc danh sách sản phẩm trên Tiktoday (khi bạn bấm nút), chấm điểm cơ hội và xuất Excel.",
+  "permissions": ["storage", "unlimitedStorage", "tabs"],
+  "host_permissions": ["https://tiktoday.vn/*", "https://www.tiktoday.vn/*"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    {
+      "matches": ["https://tiktoday.vn/*", "https://www.tiktoday.vn/*"],
+      "js": ["tiktoday.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

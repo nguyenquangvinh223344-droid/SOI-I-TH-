@@ -1,0 +1,47 @@
+CÔNG CỤ ĐỌC TIKTODAY - HƯỚNG DẪN SIÊU DỄ
+=========================================
+
+NÓ LÀ GÌ?
+Một "cái máy chép bài" gắn vào Chrome, chạy trên tiktoday.vn.
+Bạn lọc danh sách sản phẩm như bình thường. Nó chép danh sách đó vào Excel,
+chấm điểm sơ bộ, và có thể mở từng sản phẩm để đọc "bao nhiêu % doanh thu
+đến từ VIDEO" (quan trọng để biết có hợp làm affiliate không).
+
+Nó KHÔNG tự đổi bộ lọc, KHÔNG tự lật trang. Bạn lọc, bạn chuyển trang.
+
+
+CÀI (làm 1 lần). Nếu đã cài "Thu Thập Mẫu Datangon" rồi thì làm giống vậy:
+1. Tải zip mới:
+   https://github.com/nguyenquangvinh223344-droid/SOI-I-TH-/archive/refs/heads/claude/kind-davinci-e2gf50.zip
+   Giải nén (chuột phải > Giải nén tất cả).
+2. Mở Chrome, gõ  chrome://extensions  rồi Enter. Bật "Chế độ dành cho nhà phát triển".
+3. Bấm "Tải tiện ích đã giải nén", chọn thư mục:
+   Nghiên Cứu Đối Thủ  >  Công Cụ Đọc Tiktoday
+4. Vào tiktoday.vn, bấm F5. Sẽ thấy khung đen viền XANH LÁ ở góc phải dưới.
+
+
+DÙNG
+1. Vào Tiktoday > Sản phẩm. Chọn ngành, đặt bộ lọc (Xu hướng doanh thu: Tăng trưởng,
+   Số lượng NST: 1-300, Tỷ lệ hoa hồng: 10-20%...). Bấm Lọc.
+2. Ở góc dưới bảng, đổi "10 / trang" thành số lớn hơn nếu có (đỡ phải lật nhiều trang).
+3. Bấm nút xanh "Ghi trang này". Khung báo: "Thấy 10 dòng, lưu 10".
+   (Hoặc tích "Tự ghi khi tôi đổi trang" rồi tự lật trang, nó tự chép.)
+4. Muốn biết % doanh thu từ video: bấm "Đọc % video của các SP". Nó hỏi đọc bao nhiêu
+   sản phẩm (mỗi cái khoảng 10 giây, chạy ở tab nền, tự đóng). Lần đầu thử 10 đến 20 cái thôi.
+   Muốn dừng giữa chừng: bấm "Dừng".
+5. Xong bấm "Tải CSV" (mở bằng Excel). Danh sách đã xếp theo "Điểm sơ bộ" từ cao xuống thấp.
+   Bấm thêm "Tải JSON" nếu muốn gửi cho Claude.
+
+ĐIỂM SƠ BỘ (0-100) LÀ GÌ?
+Đây là điểm ĐOÁN, chưa được kiểm chứng. Cộng 4 phần, mỗi phần tối đa 25:
+- Doanh thu 7 ngày đi lên.
+- Ít nhà sáng tạo (càng gần 0 càng cao, từ 300 trở lên là 0 điểm).
+- % doanh thu đến từ video (cần đã đọc chi tiết).
+- Hoa hồng (15% trở lên là đủ điểm).
+Đừng tin tuyệt đối. Hãy nhìn thêm cột "% doanh thu từ VIDEO" và "Lượt bán / mỗi nhà sáng tạo".
+
+NẾU GẶP CHUYỆN LẠ
+- Khung báo "Không thấy dòng nào": bấm "Chẩn đoán", nó tải về một file nhỏ, gửi cho Claude.
+  (Công cụ chưa được thử trên Tiktoday thật nên lần đầu có thể phải chỉnh.)
+- Khung không hiện: kiểm tra công tắc trong chrome://extensions, rồi F5.
+- Muốn làm lại từ đầu: bấm "Xoá hết đã lưu".
