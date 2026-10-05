@@ -329,40 +329,79 @@
   }
 
   // ---------------------------------------------------------------- UI
+  let statusEl = null;
+  const show = (t) => { if (statusEl) statusEl.textContent = t; };
+  let panelEl = null;
+
+  async function summary() {
+    const a = Object.values(await loadAll());
+    const nganh = new Set(a.map((r) => r.nganh_hang + ">" + r.nganh_hang_chi_tiet));
+    return `Đã lưu ${a.length} dòng, ${nganh.size} ngách.`;
+  }
+
+  function getAuto() { try { return localStorage.getItem("dg_auto") === "1"; } catch (e) { return false; } }
+  function setAuto(v) { try { localStorage.setItem("dg_auto", v ? "1" : "0"); } catch (e) {} }
+
+  async function doRecord(prefix) {
+    try {
+      const r = await record();
+      if (r.found === 0) show("Không thấy dòng nào. Bấm Chẩn đoán và gửi file cho Claude.");
+      else show(`${prefix || ""}Thấy ${r.found} dòng, lưu ${r.saved}, khoá ${r.locked}, lỗi ${r.bad}. ` + (await summary()));
+    } catch (e) { show("Lỗi: " + e.message); }
+  }
+
+  // Chế độ tự ghi: khi bạn đổi sang ngách khác và bảng hiện xong, tự ghi 1 lần.
+  // Vẫn là bạn tự bấm chuyển ngách, công cụ chỉ ghi lại thay cho nút Ghi lại.
+  let autoTimer = null, lastSig = "";
+  function scheduleAuto(mutations) {
+    if (!getAuto()) return;
+    if (mutations && mutations.every((m) => panelEl && panelEl.contains(m.target))) return;
+    clearTimeout(autoTimer);
+    autoTimer = setTimeout(async () => {
+      const rows = findRows();
+      if (!rows.length) return;
+      const sig = location.search + "|" + (rows[0].innerText || "").slice(0, 80);
+      if (sig === lastSig) return;
+      lastSig = sig;
+      await doRecord("[Tự ghi] ");
+    }, 2000);
+  }
+
   function buildPanel() {
     const box = document.createElement("div");
+    panelEl = box;
     box.style.cssText =
       "position:fixed;right:16px;bottom:16px;z-index:2147483647;background:#111;color:#fff;" +
       "border:1px solid #f97316;border-radius:12px;padding:10px 12px;font:13px/1.4 system-ui,sans-serif;" +
-      "width:230px;box-shadow:0 4px 16px rgba(0,0,0,.5)";
+      "width:250px;box-shadow:0 4px 16px rgba(0,0,0,.5)";
     box.innerHTML =
       '<div style="font-weight:600;margin-bottom:6px">Thu thập mẫu</div>' +
-      '<div id="dgStatus" style="font-size:12px;color:#ddd;margin-bottom:8px;min-height:32px">Mở một ngách rồi bấm Ghi lại.</div>' +
+      '<div id="dgStatus" style="font-size:12px;color:#ddd;margin-bottom:8px;min-height:44px">Mở một ngách rồi bấm Ghi lại.</div>' +
+      '<label style="display:flex;gap:6px;align-items:center;font-size:12px;margin-bottom:8px;cursor:pointer"><input type="checkbox" id="dgAuto"> Tự ghi khi tôi đổi ngách</label>' +
       '<button id="dgRec" style="width:100%;padding:7px;border:0;border-radius:8px;background:#f97316;color:#fff;font-weight:600;cursor:pointer">📥 Ghi lại trang này</button>' +
       '<div style="display:flex;gap:6px;margin-top:6px">' +
-      '<button id="dgCsv" style="flex:1;padding:5px;border-radius:6px;border:1px solid #555;background:#222;color:#fff;cursor:pointer">CSV</button>' +
-      '<button id="dgJson" style="flex:1;padding:5px;border-radius:6px;border:1px solid #555;background:#222;color:#fff;cursor:pointer">JSON</button>' +
+      '<button id="dgCsv" style="flex:1;padding:5px;border-radius:6px;border:1px solid #555;background:#222;color:#fff;cursor:pointer">Tải CSV</button>' +
+      '<button id="dgJson" style="flex:1;padding:5px;border-radius:6px;border:1px solid #555;background:#222;color:#fff;cursor:pointer">Tải JSON</button>' +
       '<button id="dgDiag" style="flex:1;padding:5px;border-radius:6px;border:1px solid #555;background:#222;color:#fff;cursor:pointer" title="Tải file để gửi cho Claude nếu đọc sai">Chẩn đoán</button>' +
       "</div>" +
       '<button id="dgClear" style="width:100%;margin-top:6px;padding:4px;border-radius:6px;border:1px solid #733;background:#222;color:#f99;cursor:pointer;font-size:11px">Xoá hết mẫu đã lưu</button>';
     document.body.appendChild(box);
-    const status = box.querySelector("#dgStatus");
-    const show = (s) => (status.textContent = s);
-    loadAll().then((a) => show(`Đã lưu ${Object.keys(a).length} dòng. Mở một ngách rồi bấm Ghi lại.`));
+    statusEl = box.querySelector("#dgStatus");
+    summary().then((t) => show(t + " Mở một ngách rồi bấm Ghi lại."));
 
-    box.querySelector("#dgRec").onclick = async () => {
-      try {
-        const r = await record();
-        if (r.found === 0) show("Không thấy dòng nào. Bấm Chẩn đoán và gửi file cho Claude.");
-        else show(`Thấy ${r.found} dòng, lưu ${r.saved}, khoá ${r.locked}, lỗi ${r.bad}. Tổng đã lưu: ${r.total}.`);
-      } catch (e) { show("Lỗi: " + e.message); }
-    };
+    const chk = box.querySelector("#dgAuto");
+    chk.checked = getAuto();
+    chk.onchange = () => { setAuto(chk.checked); lastSig = ""; if (chk.checked) scheduleAuto(); };
+
+    box.querySelector("#dgRec").onclick = () => doRecord("");
     box.querySelector("#dgCsv").onclick = exportCsv;
     box.querySelector("#dgJson").onclick = exportJson;
     box.querySelector("#dgDiag").onclick = diagnose;
     box.querySelector("#dgClear").onclick = async () => {
       if (confirm("Xoá toàn bộ mẫu đã lưu?")) { await saveAll({}); show("Đã xoá hết."); }
     };
+    new MutationObserver(scheduleAuto).observe(document.body, { childList: true, subtree: true, characterData: true });
+    scheduleAuto();
   }
 
   if (document.body) buildPanel();

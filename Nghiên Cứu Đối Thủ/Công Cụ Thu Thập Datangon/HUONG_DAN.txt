@@ -1,49 +1,74 @@
-CÔNG CỤ THU THẬP MẪU DATANGON
-=============================
+CÔNG CỤ THU THẬP MẪU DATANGON - HƯỚNG DẪN SIÊU DỄ
+=================================================
 
-Công cụ này để làm gì
-- Khi bạn mở một ngách trên Datangon và bấm nút "Ghi lại", nó chép các dòng
-  sản phẩm đang hiện trên màn hình (nhãn, link và mã sản phẩm, đơn 30N, đã bán, video mới, GMV,
-  hoa hồng, và hai đường biểu đồ nhỏ) vào một bảng.
-- Bạn KHÔNG cần bấm vào từng link sản phẩm: công cụ tự lấy link và mã sản phẩm.
-  (Bấm vào link TikTok còn dễ bị hiện bảng kiểm tra bảo mật.)
-- Nó KHÔNG tự lướt, KHÔNG tự bấm gì. Chỉ chép những gì bạn đang thấy.
-- Dòng bị khoá (mờ, có chữ "Khoá") thì bỏ qua.
+NÓ LÀ GÌ?
+Một "cái máy chép bài" nhỏ gắn vào Chrome. Khi bạn xem bảng sản phẩm trên
+Datangon, nó chép bảng đó vào một file Excel giúp bạn. Bạn không phải tự gõ.
 
-Lấy công cụ về máy (không cần biết code hay GitHub)
-1. Mở link này trong trình duyệt (đã đăng nhập GitHub):
+Nó chép những gì: tên sản phẩm, nhãn (Vào ngay / Đang hot / Né ra), đơn 30n,
+đã bán, trend đơn, video mới, trend video, GMV 30n, %HH, và link sản phẩm.
+Bạn KHÔNG cần bấm vào link sản phẩm, nó tự chép link giúp.
+
+Nó KHÔNG tự đi lung tung. Bạn bấm sang ngách nào, nó chép ngách đó.
+
+
+PHẦN 1: LẤY NÓ VỀ MÁY (làm 1 lần)
+1. Mở link này trong Chrome:
    https://github.com/nguyenquangvinh223344-droid/SOI-I-TH-/archive/refs/heads/claude/kind-davinci-e2gf50.zip
-   Nó tải về một file .zip. (Nếu link báo lỗi: vào
+   Máy sẽ tải về một file nén tên SOI-I-TH-....zip.
+   (Nếu link báo lỗi: vào
    https://github.com/nguyenquangvinh223344-droid/SOI-I-TH-/tree/claude/kind-davinci-e2gf50
-   rồi bấm nút xanh "Code" > "Download ZIP".)
-2. Chuột phải file zip > "Giải nén tất cả" (Extract All).
-3. Trong thư mục vừa giải nén, đi vào: Nghiên Cứu Đối Thủ > Công Cụ Thu Thập Datangon.
-   Nhớ chỗ này, ở bước dưới sẽ chọn đúng thư mục này.
+   rồi bấm nút xanh "Code", chọn "Download ZIP".)
+2. Mở thư mục Tải xuống (Downloads). Chuột phải vào file zip,
+   chọn "Giải nén tất cả" (Extract All), bấm Giải nén.
+3. Vào thư mục vừa ra, đi theo đường:
+   Nghiên Cứu Đối Thủ  >  Công Cụ Thu Thập Datangon
+   (Thư mục cuối này có file collector.js và manifest.json. Nhớ chỗ này.)
 
-Cài vào Chrome (làm một lần)
-1. Mở Chrome, gõ vào thanh địa chỉ:  chrome://extensions
-2. Bật "Chế độ dành cho nhà phát triển" (góc phải trên).
-3. Bấm "Tải tiện ích đã giải nén" và chọn thư mục "Công Cụ Thu Thập Datangon".
-4. Vào datangon.com, tải lại trang (F5). Sẽ có khung nhỏ màu đen ở góc phải
-   dưới màn hình.
 
-Cách dùng
-1. Vào một ngách con trên Datangon (ví dụ Thời trang nữ > Giày nữ).
-2. Chờ bảng hiện đủ 3 dòng mở (Vào ngay, Đang hot, Né ra).
-3. Bấm "Ghi lại trang này". Khung sẽ báo: thấy bao nhiêu dòng, lưu bao nhiêu.
-4. Sang ngách tiếp theo, bấm lại. Mỗi ngách mất chừng nửa phút.
-5. Làm khoảng 100 ngách thì bấm "CSV" (mở bằng Excel) hoặc "JSON" để tải bảng
-   về, rồi gửi file cho Claude.
+PHẦN 2: GẮN NÓ VÀO CHROME (làm 1 lần)
+1. Mở Chrome. Trên thanh địa chỉ gõ:   chrome://extensions   rồi Enter.
+2. Góc phải trên có công tắc "Chế độ dành cho nhà phát triển". Bật nó lên.
+3. Bấm nút "Tải tiện ích đã giải nén".
+4. Chọn đúng thư mục "Công Cụ Thu Thập Datangon" (ở Phần 1, bước 3). Bấm Chọn.
+5. Thấy tên "Thu Thập Mẫu Datangon" hiện trong danh sách là xong.
+6. Vào datangon.com, bấm phím F5 để tải lại trang.
+   Sẽ thấy một cái khung đen viền cam ở góc phải dưới màn hình. Đó là nó.
 
-Nếu khung báo "Không thấy dòng nào" hoặc số liệu nhìn sai
-- Bấm "Chẩn đoán", nó tải về một file nhỏ. Gửi file đó cho Claude để chỉnh
-  lại cách đọc. Lần chạy đầu có thể phải chỉnh một lần, vì Claude chưa nhìn
-  được bên trong trang Datangon thật.
 
-Ghi chú để đọc dữ liệu
-- Chữ "T" trong GMV (ví dụ 2.1T) đang được hiểu là TỶ. Cột gmv30n_raw giữ
-  nguyên chữ gốc để kiểm tra lại.
-- Cột trend_don_ys và trend_video_ys là các điểm của đường biểu đồ, tính theo
-  trục y của màn hình: SỐ NHỎ = Ở TRÊN = GIÁ TRỊ CAO. Đường đi từ trái sang phải
-  mà số giảm dần nghĩa là biểu đồ đang đi lên.
-- Dữ liệu lưu trong trình duyệt của bạn. Nút "Xoá hết mẫu đã lưu" xoá sạch.
+PHẦN 3: DÙNG NÓ
+Cách lười nhất (khuyên dùng):
+1. Trong khung đen, tích vào ô "Tự ghi khi tôi đổi ngách".
+2. Bấm sang một ngách (ví dụ Áo nữ). Chờ bảng hiện đủ 3 dòng.
+3. Chờ khoảng 2 giây. Khung đen tự báo: "[Tự ghi] Thấy 4 dòng, lưu 3 ...".
+   Chữ "lưu 3" nghĩa là chép được 3 sản phẩm. Đúng rồi.
+4. Bấm sang ngách tiếp theo (Giày nữ, Quần nữ...). Nó tự chép tiếp.
+5. Đi hết các ngách của ngành này, rồi sang ngành lớn khác (Nhà cửa, Điện tử...).
+   Làm một vòng khoảng 30 phút.
+
+Cách bấm tay (nếu không muốn tự ghi):
+- Bỏ tích ô "Tự ghi". Mỗi ngách, chờ bảng hiện xong thì bấm nút cam
+  "Ghi lại trang này".
+
+
+PHẦN 4: LẤY BẢNG VỀ
+Khi đi xong, bấm nút "Tải CSV" trong khung đen. Máy tải về file
+datangon-mau.csv (mở bằng Excel được). Gửi file đó cho Claude.
+(Có thể bấm thêm "Tải JSON" và gửi luôn, để có đủ đường biểu đồ.)
+
+
+NẾU GẶP CHUYỆN LẠ
+- Khung đen không hiện: vào chrome://extensions, kiểm tra công tắc của
+  "Thu Thập Mẫu Datangon" đã bật chưa, rồi F5 lại trang Datangon.
+- Khung báo "Không thấy dòng nào" hoặc số nhìn sai: bấm nút "Chẩn đoán".
+  Nó tải về một file nhỏ. Gửi file đó cho Claude để sửa.
+  (Công cụ chưa được thử trên trang Datangon thật, nên lần đầu có thể phải
+  chỉnh một chút. Đừng lo, đó là bình thường.)
+- Muốn làm lại từ đầu: bấm "Xoá hết mẫu đã lưu".
+
+
+GHI CHÚ ĐỂ ĐỌC DỮ LIỆU (dành cho Claude)
+- Chữ "T" trong GMV (ví dụ 2.1T) đang được hiểu là TỶ. Cột gmv30n_raw giữ chữ gốc.
+- trend_don_ys và trend_video_ys là các điểm của đường biểu đồ theo trục y
+  của màn hình: SỐ NHỎ = Ở TRÊN = GIÁ TRỊ CAO.
+- Dữ liệu lưu trong trình duyệt của bạn, không gửi đi đâu.
