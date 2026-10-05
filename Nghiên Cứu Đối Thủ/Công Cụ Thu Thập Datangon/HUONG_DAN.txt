@@ -3,10 +3,22 @@ CÔNG CỤ THU THẬP MẪU DATANGON
 
 Công cụ này để làm gì
 - Khi bạn mở một ngách trên Datangon và bấm nút "Ghi lại", nó chép các dòng
-  sản phẩm đang hiện trên màn hình (nhãn, đơn 30N, đã bán, video mới, GMV,
+  sản phẩm đang hiện trên màn hình (nhãn, link và mã sản phẩm, đơn 30N, đã bán, video mới, GMV,
   hoa hồng, và hai đường biểu đồ nhỏ) vào một bảng.
+- Bạn KHÔNG cần bấm vào từng link sản phẩm: công cụ tự lấy link và mã sản phẩm.
+  (Bấm vào link TikTok còn dễ bị hiện bảng kiểm tra bảo mật.)
 - Nó KHÔNG tự lướt, KHÔNG tự bấm gì. Chỉ chép những gì bạn đang thấy.
 - Dòng bị khoá (mờ, có chữ "Khoá") thì bỏ qua.
+
+Lấy công cụ về máy (không cần biết code hay GitHub)
+1. Mở link này trong trình duyệt (đã đăng nhập GitHub):
+   https://github.com/nguyenquangvinh223344-droid/SOI-I-TH-/archive/refs/heads/claude/kind-davinci-e2gf50.zip
+   Nó tải về một file .zip. (Nếu link báo lỗi: vào
+   https://github.com/nguyenquangvinh223344-droid/SOI-I-TH-/tree/claude/kind-davinci-e2gf50
+   rồi bấm nút xanh "Code" > "Download ZIP".)
+2. Chuột phải file zip > "Giải nén tất cả" (Extract All).
+3. Trong thư mục vừa giải nén, đi vào: Nghiên Cứu Đối Thủ > Công Cụ Thu Thập Datangon.
+   Nhớ chỗ này, ở bước dưới sẽ chọn đúng thư mục này.
 
 Cài vào Chrome (làm một lần)
 1. Mở Chrome, gõ vào thanh địa chỉ:  chrome://extensions

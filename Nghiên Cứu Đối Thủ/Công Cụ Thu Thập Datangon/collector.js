@@ -205,8 +205,15 @@
     const ys = (s) => (s ? s.points.map((p) => p[1]).join(";") : "");
 
     const img = row.querySelector("img");
+    // link "mở sản phẩm trên TikTok" (biểu tượng ở cuối dòng), có chứa mã sản phẩm
+    const linkEl = Array.from(row.querySelectorAll("a[href]")).find((a) => /\/product\/\d+/.test(a.href)) ||
+      Array.from(row.querySelectorAll("a[href]")).find((a) => /tiktok\.com/.test(a.href));
+    const link = linkEl ? linkEl.href : "";
+    const idm = link.match(/\/product\/(\d+)/);
     return {
       locked: false,
+      id_sp: idm ? idm[1] : "",
+      link_sp: link,
       nhan: label,
       ten_sp: nameLine,
       sao: rating,
@@ -266,7 +273,7 @@
       const r = parseRow(row);
       if (r.locked) { locked++; continue; }
       if (!r.nhan) { bad++; continue; }
-      const key = [info.nganh_hang, info.nganh_hang_chi_tiet, r.nhan, r.anh || r.ten_sp].join("||");
+      const key = [info.nganh_hang, info.nganh_hang_chi_tiet, r.nhan, r.id_sp || r.anh || r.ten_sp].join("||");
       all[key] = Object.assign({ thoi_gian: new Date().toISOString(), url: location.href }, info, r);
       saved++;
     }
@@ -276,7 +283,7 @@
 
   // ------------------------------------------------------------- xuất
   const CSV_COLS = [
-    "thoi_gian", "nganh_hang", "nganh_hang_chi_tiet", "nhan", "ten_sp", "sao", "so_danh_gia_raw",
+    "thoi_gian", "nganh_hang", "nganh_hang_chi_tiet", "nhan", "id_sp", "link_sp", "ten_sp", "sao", "so_danh_gia_raw",
     "don30n_raw", "don30n", "mui_ten", "da_ban_raw", "da_ban", "video_moi_pct", "gmv30n_raw",
     "gmv30n_vnd", "hoa_hong_raw", "hoa_hong_pct", "trend_don_ys", "trend_video_ys",
     "so_duong_bieu_do", "tong_sp_ngach", "cap_nhat_tren_trang", "url",
