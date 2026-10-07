@@ -134,7 +134,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
             </div>
-            <p class="text-xs font-semibold text-gray-300">Kéo thả hoặc nhấn để chọn Ảnh Mẫu</p>
+            <p class="text-xs font-semibold text-gray-300">Kéo thả, nhấn chọn hoặc Ctrl+V để dán Ảnh Mẫu</p>
             <p class="text-[11px] text-gray-500">Mẫu sẽ được cố định hoàn toàn (mặt, tóc, bối cảnh phòng, góc chụp)</p>
           </div>
 
@@ -174,7 +174,7 @@
               </svg>
             </div>
             <div class="text-left">
-              <p class="text-xs font-semibold text-gray-300">Nhấn hoặc kéo nhiều ảnh sản phẩm vào đây</p>
+              <p class="text-xs font-semibold text-gray-300">Nhấn, kéo hoặc Ctrl+V dán nhiều ảnh sản phẩm vào đây</p>
               <p class="text-[11px] text-gray-500">Hỗ trợ chọn cùng lúc nhiều áo, quần, đầm, áo khoác...</p>
             </div>
           </div>
@@ -347,7 +347,7 @@
             <div class="w-12 h-12 rounded-xl bg-gray-800 group-hover:bg-brand-500/20 text-gray-400 group-hover:text-brand-400 flex items-center justify-center transition-colors">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
             </div>
-            <p class="text-xs font-semibold text-gray-300">Kéo thả hoặc nhấn để chọn Ảnh Mẫu</p>
+            <p class="text-xs font-semibold text-gray-300">Kéo thả, nhấn chọn hoặc Ctrl+V để dán Ảnh Mẫu</p>
             <p class="text-[11px] text-gray-500">Mẫu sẽ giữ nguyên toàn bộ trang phục và phụ kiện đang mặc</p>
           </div>
 
@@ -384,7 +384,7 @@
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
             </div>
             <div class="text-left">
-              <p class="text-xs font-semibold text-gray-300">Ném bao nhiêu ảnh bối cảnh tùy ý vào đây</p>
+              <p class="text-xs font-semibold text-gray-300">Ném hoặc Ctrl+V dán bao nhiêu ảnh bối cảnh tùy ý vào đây</p>
               <p class="text-[11px] text-gray-500">Ảnh bất kỳ người mẫu nào đứng ở nơi đẹp: sân bóng, biển, quán cà phê...</p>
             </div>
           </div>
@@ -2095,6 +2095,68 @@
       sceneState.results = [];
       renderSceneResults();
       showToast('Đã xóa danh sách kết quả', 'info');
+    });
+    const PASTE_ZONES = [
+      { id: 'modelDropZone', tab: 'outfit', label: 'Ảnh Người Mẫu', run: (files) => setModelImage(files[0]) },
+      { id: 'productDropZone', tab: 'outfit', label: 'Sản Phẩm Cần Mặc', run: (files) => addBatchProducts(files) },
+      { id: 'sModelDropZone', tab: 'scene', label: 'Ảnh Người Mẫu (tab Ghép Bối Cảnh)', run: (files) => setSceneModel(files[0]) },
+      { id: 'sceneDropZone', tab: 'scene', label: 'Ảnh Bối Cảnh', run: (files) => addScenes(files) }
+    ];
+
+    let activePasteZoneId = null;
+
+    function currentTabName() {
+      return document.getElementById('panelScene').classList.contains('tab-hidden') ? 'outfit' : 'scene';
+    }
+
+    function markActivePasteZone(id) {
+      activePasteZoneId = id;
+      PASTE_ZONES.forEach((z) => {
+        const el = document.getElementById(z.id);
+        ['ring-2', 'ring-brand-500/60'].forEach(c => el.classList.toggle(c, z.id === id));
+      });
+    }
+
+    PASTE_ZONES.forEach((z) => {
+      const el = document.getElementById(z.id);
+      el.addEventListener('mouseenter', () => markActivePasteZone(z.id));
+      el.addEventListener('click', () => markActivePasteZone(z.id));
+    });
+
+    document.getElementById('tabBtnOutfit').addEventListener('click', () => markActivePasteZone(null));
+    document.getElementById('tabBtnScene').addEventListener('click', () => markActivePasteZone(null));
+
+    function resolvePasteZone() {
+      const tab = currentTabName();
+      const active = PASTE_ZONES.find(z => z.id === activePasteZoneId && z.tab === tab);
+      if (active) return active;
+      if (tab === 'outfit') {
+        return PASTE_ZONES.find(z => z.id === (state.modelImage ? 'productDropZone' : 'modelDropZone'));
+      }
+      return PASTE_ZONES.find(z => z.id === (sceneState.model ? 'sceneDropZone' : 'sModelDropZone'));
+    }
+
+    document.addEventListener('paste', async (e) => {
+      if (!document.getElementById('settingsModal').classList.contains('hidden')) return;
+      const items = e.clipboardData ? Array.from(e.clipboardData.items || []) : [];
+      const rawFiles = items
+        .filter(it => it.kind === 'file' && it.type.startsWith('image/'))
+        .map(it => it.getAsFile())
+        .filter(Boolean);
+      if (rawFiles.length === 0) return;
+
+      e.preventDefault();
+      const zone = resolvePasteZone();
+      if (!zone) return;
+
+      const stamp = Date.now();
+      const files = rawFiles.map((f, i) => {
+        const ext = (f.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
+        return new File([f], `pasted-${stamp}-${i + 1}.${ext}`, { type: f.type });
+      });
+
+      showToast(`Đã dán ${files.length} ảnh vào "${zone.label}"`, 'info');
+      await zone.run(files);
     });
   </script>
 </body>
