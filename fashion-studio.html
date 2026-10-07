@@ -1,0 +1,2101 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Fashion Studio Pro - Thay Đồ & Ghép Bối Cảnh</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+              900: '#4c1d95',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #0b0f19;
+      color: #f3f4f6;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #111827;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #374151;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #4b5563;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(124, 58, 237, 0.4); }
+      50% { box-shadow: 0 0 25px rgba(124, 58, 237, 0.8); }
+    }
+    .glow-active {
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+    .tab-hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+  <header class="border-b border-gray-800 bg-gray-900/70 backdrop-blur-md sticky top-0 z-40 px-4 lg:px-8 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/25">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+        </svg>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-lg font-bold tracking-tight text-white">AI Fashion Studio <span class="text-brand-500">Pro</span></h1>
+          <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Fixed Cam</span>
+        </div>
+        <p class="text-xs text-gray-400">Khóa mẫu & góc chụp • Tải hàng loạt sản phẩm • Tự động mix & match sáng tạo</p>
+      </div>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="flex items-center gap-3">
+      <button id="btnSettingsModal" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs font-medium text-gray-300 transition-colors border border-gray-700">
+        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+        <span>Tùy chỉnh Prompt / Key</span>
+      </button>
+      <div id="statusBadge" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-800/80 border border-gray-700/60 text-xs text-gray-300">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span id="statusBadgeText">Sẵn sàng hoạt động</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="border-b border-gray-800 bg-gray-950/70 px-4 lg:px-8">
+    <div class="max-w-7xl mx-auto flex items-end gap-1 pt-2">
+      <button type="button" id="tabBtnOutfit" class="px-4 py-2.5 text-xs font-semibold rounded-t-lg border-b-2 transition-colors text-white border-brand-500 bg-gray-900">👗 Thay Đồ &amp; Phối Đồ</button>
+      <button type="button" id="tabBtnScene" class="px-4 py-2.5 text-xs font-semibold rounded-t-lg border-b-2 transition-colors text-gray-400 border-transparent hover:text-gray-200">📍 Ghép Mẫu Vào Bối Cảnh</button>
+    </div>
+  </nav>
+
+  <!-- Notification Banner / Alert System -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none"></div>
+
+  <main id="panelOutfit" class="flex-1 p-4 lg:p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LEFT COLUMN: Inputs & Config (5 cols) -->
+    <div class="lg:col-span-5 flex flex-col gap-5">
+
+      <!-- Card 1: Khóa Mẫu (Model Anchor) -->
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-brand-500/20 text-brand-400 font-bold flex items-center justify-center text-xs border border-brand-500/30">1</span>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-gray-200">Ảnh Người Mẫu Cố Định (Lock)</h2>
+          </div>
+          <span class="text-[11px] font-medium text-amber-400 bg-amber-950/40 border border-amber-800/50 px-2 py-0.5 rounded-md flex items-center gap-1">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            Giữ nguyên mặt, dáng & góc cam
+          </span>
+        </div>
+
+        <div id="modelDropZone" class="border-2 border-dashed border-gray-700 hover:border-brand-500/70 rounded-xl transition-all p-4 text-center cursor-pointer bg-gray-950/50 hover:bg-gray-800/30 relative min-h-[170px] flex flex-col items-center justify-center group">
+          <input type="file" id="modelInput" accept="image/*" class="hidden">
+
+          <div id="modelEmptyState" class="flex flex-col items-center gap-2">
+            <div class="w-12 h-12 rounded-xl bg-gray-800 group-hover:bg-brand-500/20 text-gray-400 group-hover:text-brand-400 flex items-center justify-center transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <p class="text-xs font-semibold text-gray-300">Kéo thả hoặc nhấn để chọn Ảnh Mẫu</p>
+            <p class="text-[11px] text-gray-500">Mẫu sẽ được cố định hoàn toàn (mặt, tóc, bối cảnh phòng, góc chụp)</p>
+          </div>
+
+          <div id="modelPreviewContainer" class="hidden w-full flex items-center gap-4">
+            <div class="relative w-28 h-36 rounded-lg overflow-hidden border border-brand-500/40 bg-gray-900 shrink-0">
+              <img id="modelPreviewImg" src="" alt="Model" class="w-full h-full object-cover">
+              <span class="absolute top-1 left-1 bg-black/70 backdrop-blur-sm text-[9px] font-bold text-white px-1.5 py-0.5 rounded">LOCKED</span>
+            </div>
+            <div class="text-left flex-1 min-w-0">
+              <p id="modelFileName" class="text-xs font-semibold text-gray-200 truncate">model.jpg</p>
+              <p id="modelFileSize" class="text-[11px] text-gray-400 mt-0.5">2.4 MB</p>
+              <div class="mt-3 flex items-center gap-2">
+                <button type="button" id="btnChangeModel" class="text-xs font-medium px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700">Đổi ảnh</button>
+                <button type="button" id="btnRemoveModel" class="text-xs font-medium px-2.5 py-1 rounded bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/40">Xóa</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Tải Hàng Loạt Sản Phẩm (Batch Products) -->
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl flex-1 flex flex-col">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold flex items-center justify-center text-xs border border-indigo-500/30">2</span>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-gray-200">Sản Phẩm Cần Mặc (Tải Hàng Loạt)</h2>
+          </div>
+          <span id="productCounter" class="text-xs font-semibold text-gray-400 bg-gray-800 px-2 py-0.5 rounded-full border border-gray-700">0 sản phẩm</span>
+        </div>
+
+        <div id="productDropZone" class="border-2 border-dashed border-gray-700 hover:border-indigo-500/70 rounded-xl transition-all p-3 text-center cursor-pointer bg-gray-950/50 hover:bg-gray-800/30 mb-3 group">
+          <input type="file" id="productInput" accept="image/*" multiple class="hidden">
+          <div class="flex items-center justify-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gray-800 group-hover:bg-indigo-500/20 text-gray-400 group-hover:text-indigo-400 flex items-center justify-center transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+            </div>
+            <div class="text-left">
+              <p class="text-xs font-semibold text-gray-300">Nhấn hoặc kéo nhiều ảnh sản phẩm vào đây</p>
+              <p class="text-[11px] text-gray-500">Hỗ trợ chọn cùng lúc nhiều áo, quần, đầm, áo khoác...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Products Queue List -->
+        <div class="flex-1 min-h-[160px] max-h-[260px] overflow-y-auto custom-scrollbar border border-gray-800 rounded-xl p-2 bg-gray-950/30 space-y-2" id="productsQueueList">
+          <div id="emptyQueueMsg" class="h-full flex flex-col items-center justify-center text-gray-500 py-8 text-center">
+            <svg class="w-8 h-8 text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+            <p class="text-xs">Chưa có sản phẩm nào được tải lên</p>
+            <p class="text-[11px] text-gray-600">Mỗi ảnh sản phẩm sẽ được phối thành một outfit hoàn chỉnh</p>
+          </div>
+        </div>
+
+        <!-- Action bar for queue -->
+        <div class="mt-3 pt-3 border-t border-gray-800/80 flex items-center justify-between text-xs">
+          <button id="btnClearProducts" class="text-gray-400 hover:text-rose-400 font-medium transition-colors">Xóa danh sách</button>
+          <span class="text-gray-500">Mỗi sản phẩm tự động sinh phối đồ riêng</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Cơ chế Randomize & Phong cách Stylist -->
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs border border-emerald-500/30">3</span>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-gray-200">Cơ chế Phối Đồ Ngẫu Nhiên</h2>
+          </div>
+          <span class="text-[11px] text-emerald-400 font-semibold bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/40">Sáng Tạo Không Trùng</span>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1.5">Gu thẩm mỹ ưu tiên (AI Stylist Mood):</label>
+            <select id="styleMoodSelect" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-brand-500">
+              <option value="auto">🎲 Random Vòng Quay (Mỗi ảnh 1 gu khác nhau: Streetwear, Vintage, Cozy, Sweet...)</option>
+              <option value="streetwear">🛹 Năng động & Phố phường (Streetwear, Y2K cá tính)</option>
+              <option value="korean_minimal">✨ Tối giản Hàn Quốc (Minimal chic, thanh lịch, tone màu tinh tế)</option>
+              <option value="cozy_autumn">🍂 Ấm áp Mùa Thu/Đông (Cozy, layer, khăn len mỏng)</option>
+              <option value="sporty">⚡ Năng động Thể Thao (Sporty casual)</option>
+              <option value="vintage">📼 Cổ điển Hoài niệm (Retro, vintage aesthetic)</option>
+            </select>
+          </div>
+
+          <!-- Accessory Roulette Checkboxes -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="text-xs font-semibold text-gray-300">Kho phụ kiện xoay tua (Random 0 - 3 món/ảnh):</label>
+              <span class="text-[10px] text-gray-400">Không bao giờ nhồi nhét tất cả</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-[11px] bg-gray-950/60 p-2.5 rounded-xl border border-gray-800">
+              <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
+                <input type="checkbox" checked class="rounded border-gray-700 bg-gray-900 text-brand-500 focus:ring-0 acc-item" value="caps_beanies">
+                <span>Mũ (lưỡi trai, beanie, bucket)</span>
+              </label>
+              <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
+                <input type="checkbox" checked class="rounded border-gray-700 bg-gray-900 text-brand-500 focus:ring-0 acc-item" value="hair_clips">
+                <span>Kẹp tóc / Băng đô ngẫu hứng</span>
+              </label>
+              <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
+                <input type="checkbox" checked class="rounded border-gray-700 bg-gray-900 text-brand-500 focus:ring-0 acc-item" value="glasses">
+                <span>Kính mắt (đeo hoặc cài trên đầu)</span>
+              </label>
+              <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
+                <input type="checkbox" checked class="rounded border-gray-700 bg-gray-900 text-brand-500 focus:ring-0 acc-item" value="bags_backpack">
+                <span>Túi xách / Balo đeo tự nhiên</span>
+              </label>
+              <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
+                <input type="checkbox" checked class="rounded border-gray-700 bg-gray-900 text-brand-500 focus:ring-0 acc-item" value="scarves">
+                <span>Khăn quàng cổ mùa lạnh</span>
+              </label>
+              <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
+                <input type="checkbox" checked class="rounded border-gray-700 bg-gray-900 text-brand-500 focus:ring-0 acc-item" value="jewelry">
+                <span>Trang sức nhỏ (dây chuyền, vòng)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Master Generate Button -->
+        <button id="btnStartBatch" class="w-full mt-4 py-3.5 px-4 bg-gradient-to-r from-brand-600 via-indigo-600 to-brand-700 hover:from-brand-500 hover:to-indigo-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-brand-600/30 flex items-center justify-center gap-2 transition-all transform active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none">
+          <svg class="w-5 h-5 animate-spin hidden" id="spinnerBatch" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          <svg class="w-5 h-5" id="sparkleBatchIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+          </svg>
+          <span id="btnBatchText">Bắt đầu Thay Đồ & Phối Hàng Loạt</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: Output Gallery & Results (7 cols) -->
+    <div class="lg:col-span-7 flex flex-col gap-5">
+
+      <!-- Action & Filter Bar -->
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>Bộ Sưu Tập Đã Phối</span>
+            <span id="resultCountBadge" class="text-xs bg-brand-500/20 text-brand-400 border border-brand-500/30 px-2 py-0.5 rounded-full font-semibold">0 kết quả</span>
+          </h2>
+          <p class="text-[11px] text-gray-400">Ảnh chân thật như chụp camera điện thoại thường, không bị nhựa, giữ nguyên góc máy</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="btnDownloadAll" disabled class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 disabled:opacity-40 disabled:pointer-events-none text-gray-200 border border-gray-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            Tải Tất Cả Ảnh
+          </button>
+          <button id="btnClearResults" class="p-1.5 text-gray-400 hover:text-rose-400 rounded-lg hover:bg-gray-800 transition-colors" title="Xóa kết quả">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Results Grid Container -->
+      <div id="resultsGrid" class="flex-1 min-h-[480px] bg-gray-950/40 border border-gray-800/80 rounded-2xl p-4 overflow-y-auto custom-scrollbar">
+        <!-- Empty State -->
+        <div id="resultsEmptyState" class="h-full min-h-[420px] flex flex-col items-center justify-center text-center p-6">
+          <div class="w-16 h-16 rounded-2xl bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-600 mb-3 shadow-inner">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <h3 class="text-sm font-semibold text-gray-300">Chưa có ảnh phối nào được tạo</h3>
+          <p class="text-xs text-gray-500 max-w-sm mt-1">
+            Hãy tải lên 1 ảnh người mẫu mẫu và ít nhất 1 ảnh sản phẩm. Hệ thống sẽ tự động phối đồ và xuất ảnh tại đây!
+          </p>
+        </div>
+
+        <!-- Actual Cards Grid -->
+        <div id="cardsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      </div>
+
+      <!-- Quick Guidance -->
+      <div class="bg-gray-900/60 border border-gray-800/60 rounded-xl p-3 text-[11px] text-gray-400 flex items-start gap-2.5">
+        <svg class="w-4 h-4 text-brand-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span>
+          <strong>Cơ chế khóa chuẩn xác:</strong> Prompt đã được tối ưu để yêu cầu model AI giữ nguyên tỷ lệ khuôn mặt, mắt, biểu cảm, màu tóc, dáng đứng và nền phòng thật từ Ảnh 1. Các chi tiết quần/áo đi kèm, kính, kẹp tóc, balo sẽ được tung xúc xắc sinh ngẫu nhiên cho từng sản phẩm!
+        </span>
+      </div>
+
+    </div>
+  </main>
+
+  <main id="panelScene" class="tab-hidden flex-1 p-4 lg:p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <div class="lg:col-span-5 flex flex-col gap-5">
+
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-brand-500/20 text-brand-400 font-bold flex items-center justify-center text-xs border border-brand-500/30">1</span>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-gray-200">Ảnh Người Mẫu Của Bạn</h2>
+          </div>
+          <span class="text-[11px] font-medium text-amber-400 bg-amber-950/40 border border-amber-800/50 px-2 py-0.5 rounded-md">Giữ mặt, tóc, body &amp; trang phục</span>
+        </div>
+
+        <div id="sModelDropZone" class="border-2 border-dashed border-gray-700 hover:border-brand-500/70 rounded-xl transition-all p-4 text-center cursor-pointer bg-gray-950/50 hover:bg-gray-800/30 relative min-h-[170px] flex flex-col items-center justify-center group">
+          <input type="file" id="sModelInput" accept="image/*" class="hidden">
+
+          <div id="sModelEmpty" class="flex flex-col items-center gap-2">
+            <div class="w-12 h-12 rounded-xl bg-gray-800 group-hover:bg-brand-500/20 text-gray-400 group-hover:text-brand-400 flex items-center justify-center transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            </div>
+            <p class="text-xs font-semibold text-gray-300">Kéo thả hoặc nhấn để chọn Ảnh Mẫu</p>
+            <p class="text-[11px] text-gray-500">Mẫu sẽ giữ nguyên toàn bộ trang phục và phụ kiện đang mặc</p>
+          </div>
+
+          <div id="sModelPreview" class="hidden w-full flex items-center gap-4">
+            <div class="relative w-28 h-36 rounded-lg overflow-hidden border border-brand-500/40 bg-gray-900 shrink-0">
+              <img id="sModelImg" src="" alt="Model" class="w-full h-full object-cover">
+              <span class="absolute top-1 left-1 bg-black/70 backdrop-blur-sm text-[9px] font-bold text-white px-1.5 py-0.5 rounded">MẪU</span>
+            </div>
+            <div class="text-left flex-1 min-w-0">
+              <p id="sModelName" class="text-xs font-semibold text-gray-200 truncate">model.jpg</p>
+              <p id="sModelSize" class="text-[11px] text-gray-400 mt-0.5">2.4 MB</p>
+              <div class="mt-3 flex items-center gap-2">
+                <button type="button" id="sBtnChangeModel" class="text-xs font-medium px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700">Đổi ảnh</button>
+                <button type="button" id="sBtnRemoveModel" class="text-xs font-medium px-2.5 py-1 rounded bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/40">Xóa</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl flex-1 flex flex-col">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold flex items-center justify-center text-xs border border-indigo-500/30">2</span>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-gray-200">Ảnh Bối Cảnh Tham Khảo</h2>
+          </div>
+          <span id="sceneCounter" class="text-xs font-semibold text-gray-400 bg-gray-800 px-2 py-0.5 rounded-full border border-gray-700">0 bối cảnh</span>
+        </div>
+
+        <div id="sceneDropZone" class="border-2 border-dashed border-gray-700 hover:border-indigo-500/70 rounded-xl transition-all p-3 text-center cursor-pointer bg-gray-950/50 hover:bg-gray-800/30 mb-3 group">
+          <input type="file" id="sceneInput" accept="image/*" multiple class="hidden">
+          <div class="flex items-center justify-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gray-800 group-hover:bg-indigo-500/20 text-gray-400 group-hover:text-indigo-400 flex items-center justify-center transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            </div>
+            <div class="text-left">
+              <p class="text-xs font-semibold text-gray-300">Ném bao nhiêu ảnh bối cảnh tùy ý vào đây</p>
+              <p class="text-[11px] text-gray-500">Ảnh bất kỳ người mẫu nào đứng ở nơi đẹp: sân bóng, biển, quán cà phê...</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-1 min-h-[160px] max-h-[260px] overflow-y-auto custom-scrollbar border border-gray-800 rounded-xl p-2 bg-gray-950/30 space-y-2" id="sceneList">
+          <div class="h-full flex flex-col items-center justify-center text-gray-500 py-8 text-center">
+            <p class="text-xs">Chưa có ảnh bối cảnh nào</p>
+            <p class="text-[11px] text-gray-600">Người trong ảnh sẽ được thay bằng mẫu của bạn, giữ dáng và góc máy</p>
+          </div>
+        </div>
+
+        <div class="mt-3 pt-3 border-t border-gray-800/80 flex items-center justify-between text-xs">
+          <button type="button" id="sBtnClearScenes" class="text-gray-400 hover:text-rose-400 font-medium transition-colors">Xóa danh sách</button>
+          <span class="text-gray-500">Mỗi ảnh bối cảnh tạo ra một ảnh ghép</span>
+        </div>
+      </div>
+
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs border border-emerald-500/30">3</span>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-gray-200">Tùy Chọn Ghép</h2>
+          </div>
+          <span class="text-[11px] text-emerald-400 font-semibold bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/40">Ánh sáng &amp; bóng đổ thật</span>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-semibold text-gray-300 mb-1.5">Mức chân thật (chống cảm giác ghép layer):</label>
+            <select id="sceneRealism" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-gray-200 focus:outline-none focus:border-brand-500">
+              <option value="high" selected>Cao: checklist đầy đủ (ánh sáng, bóng đổ, ánh phản, hạt ảnh, viền tóc)</option>
+              <option value="standard">Chuẩn: ngắn gọn, ít can thiệp</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-gray-300 mb-1.5">Biểu cảm khuôn mặt:</label>
+            <select id="sceneExpression" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-gray-200 focus:outline-none focus:border-brand-500">
+              <option value="keep_model" selected>Giữ biểu cảm tự nhiên của mẫu</option>
+              <option value="copy_reference">Theo biểu cảm của người trong ảnh bối cảnh</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-gray-300 mb-1.5">Số bản tạo cho mỗi bối cảnh:</label>
+            <select id="sceneVariants" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-gray-200 focus:outline-none focus:border-brand-500">
+              <option value="1" selected>1 bản</option>
+              <option value="2">2 bản (chọn bản đẹp nhất)</option>
+              <option value="3">3 bản (chọn bản đẹp nhất)</option>
+            </select>
+          </div>
+
+          <div class="bg-gray-950/60 p-2.5 rounded-xl border border-gray-800 space-y-2">
+            <label class="flex items-start gap-2 text-gray-300 cursor-pointer">
+              <input type="checkbox" id="sceneAnalyze" checked class="mt-0.5 rounded border-gray-700 bg-gray-900 text-brand-500 focus:ring-0">
+              <span>Phân tích ánh sáng ảnh bối cảnh trước khi ghép (chậm hơn một chút, bóng đổ chuẩn hơn)</span>
+            </label>
+            <label class="flex items-start gap-2 text-gray-300 cursor-pointer">
+              <input type="checkbox" id="sceneRemoveHeld" checked class="mt-0.5 rounded border-gray-700 bg-gray-900 text-brand-500 focus:ring-0">
+              <span>Bỏ đồ vật cầm trên tay của mẫu (điện thoại, ly...)</span>
+            </label>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-gray-300 mb-1.5">Ghi chú thêm (không bắt buộc):</label>
+            <textarea id="sceneNote" rows="2" placeholder="Ví dụ: bóng đổ ra phía sau lưng, mặt mỉm cười nhẹ, thêm giày sneaker trắng..." class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-gray-200 focus:outline-none focus:border-brand-500 resize-none"></textarea>
+          </div>
+        </div>
+
+        <button type="button" id="sBtnStart" class="w-full mt-4 py-3.5 px-4 bg-gradient-to-r from-brand-600 via-indigo-600 to-brand-700 hover:from-brand-500 hover:to-indigo-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-brand-600/30 flex items-center justify-center gap-2 transition-all transform active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none">
+          <svg class="w-5 h-5 animate-spin hidden" id="sSpinner" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          <span id="sBtnText">Bắt đầu Ghép Mẫu Vào Bối Cảnh</span>
+        </button>
+      </div>
+
+    </div>
+
+    <div class="lg:col-span-7 flex flex-col gap-5">
+
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>Ảnh Đã Ghép Bối Cảnh</span>
+            <span id="sResultCount" class="text-xs bg-brand-500/20 text-brand-400 border border-brand-500/30 px-2 py-0.5 rounded-full font-semibold">0 kết quả</span>
+          </h2>
+          <p class="text-[11px] text-gray-400">Giữ nguyên bối cảnh, góc máy, dáng đứng của ảnh tham khảo và trang phục của mẫu</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" id="sBtnDownloadAll" disabled class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 disabled:opacity-40 disabled:pointer-events-none text-gray-200 border border-gray-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            Tải Tất Cả Ảnh
+          </button>
+          <button type="button" id="sBtnClearResults" class="p-1.5 text-gray-400 hover:text-rose-400 rounded-lg hover:bg-gray-800 transition-colors" title="Xóa kết quả">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 min-h-[480px] bg-gray-950/40 border border-gray-800/80 rounded-2xl p-4 overflow-y-auto custom-scrollbar">
+        <div id="sEmptyState" class="h-full min-h-[420px] flex flex-col items-center justify-center text-center p-6">
+          <div class="w-16 h-16 rounded-2xl bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-600 mb-3 shadow-inner">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          </div>
+          <h3 class="text-sm font-semibold text-gray-300">Chưa có ảnh ghép nào được tạo</h3>
+          <p class="text-xs text-gray-500 max-w-sm mt-1">Tải lên ảnh người mẫu của bạn và ít nhất 1 ảnh bối cảnh tham khảo. Hệ thống sẽ thay người trong bối cảnh bằng mẫu của bạn.</p>
+        </div>
+        <div id="sCards" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      </div>
+
+      <div class="bg-gray-900/60 border border-gray-800/60 rounded-xl p-3 text-[11px] text-gray-400 flex items-start gap-2.5">
+        <svg class="w-4 h-4 text-brand-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <span>
+          <strong>Cách ghép chân thật:</strong> prompt yêu cầu model đọc hướng sáng của ảnh bối cảnh (mặt sáng từ phía trước thì bóng đổ ra phía sau, ngược sáng thì có viền sáng), thêm bóng tiếp đất, ánh phản từ môi trường, cùng hạt ảnh, độ nét và tông màu với nền. Nếu một bản chưa ưng, chọn 2 đến 3 bản mỗi bối cảnh hoặc bấm "Tạo lại" trên từng ảnh.
+        </span>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="sPreviewModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+        <div>
+          <h3 class="text-sm font-bold text-white">Chi Tiết Ảnh Ghép Bối Cảnh</h3>
+          <p class="text-[11px] text-gray-400">So sánh với ảnh mẫu và ảnh bối cảnh gốc</p>
+        </div>
+        <button type="button" id="sBtnClosePreview" class="p-1.5 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 flex flex-col md:flex-row items-center justify-center gap-4 bg-gray-950">
+        <div class="flex flex-col items-center gap-1.5 w-full md:w-1/3">
+          <span class="text-xs font-semibold text-gray-400">Ảnh Người Mẫu</span>
+          <div class="w-full h-80 rounded-xl overflow-hidden border border-gray-800 bg-gray-900 flex items-center justify-center">
+            <img id="sModalModelImg" src="" alt="Model" class="w-full h-full object-contain">
+          </div>
+        </div>
+        <div class="flex flex-col items-center gap-1.5 w-full md:w-1/3">
+          <span class="text-xs font-semibold text-gray-400">Ảnh Bối Cảnh Gốc</span>
+          <div class="w-full h-80 rounded-xl overflow-hidden border border-gray-800 bg-gray-900 flex items-center justify-center">
+            <img id="sModalSceneImg" src="" alt="Scene" class="w-full h-full object-contain">
+          </div>
+        </div>
+        <div class="flex flex-col items-center gap-1.5 w-full md:w-1/3">
+          <span class="text-xs font-bold text-emerald-400 flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            Kết Quả Ghép
+          </span>
+          <div class="w-full h-80 rounded-xl overflow-hidden border-2 border-emerald-500/50 bg-gray-900 flex items-center justify-center relative">
+            <img id="sModalResultImg" src="" alt="Result" class="w-full h-full object-contain">
+            <a id="sModalDownload" href="#" download="scene-swap.png" class="absolute bottom-3 right-3 bg-emerald-600 hover:bg-emerald-500 text-white p-2 rounded-lg shadow-lg flex items-center gap-1 text-xs font-bold transition-all">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              Tải ảnh này
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-3 border-t border-gray-800 bg-gray-900/90 text-[11px] text-gray-400">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-semibold text-gray-300">Prompt Đã Dùng:</span>
+          <button type="button" id="sBtnCopyPrompt" class="text-brand-400 hover:text-brand-300 font-medium">Sao chép prompt</button>
+        </div>
+        <p id="sModalPrompt" class="font-mono bg-gray-950 p-2 rounded border border-gray-800 max-h-24 overflow-y-auto text-[10px] text-gray-400 select-all whitespace-pre-wrap"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Compare & Fullview -->
+  <div id="previewModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>Chi Tiết Ảnh Phối Đồ</span>
+            <span id="modalStyleTag" class="text-[10px] bg-brand-500/20 text-brand-300 px-2 py-0.5 rounded-full border border-brand-500/30">Streetwear</span>
+          </h3>
+          <p id="modalSubTitle" class="text-[11px] text-gray-400">So sánh đối chiếu với ảnh gốc</p>
+        </div>
+        <button id="btnClosePreviewModal" class="p-1.5 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 flex flex-col md:flex-row items-center justify-center gap-4 bg-gray-950">
+        <!-- Model Base -->
+        <div class="flex flex-col items-center gap-1.5 w-full md:w-1/3">
+          <span class="text-xs font-semibold text-gray-400">Ảnh Người Mẫu Gốc</span>
+          <div class="w-full h-80 rounded-xl overflow-hidden border border-gray-800 bg-gray-900 flex items-center justify-center">
+            <img id="modalModelImg" src="" alt="Model" class="w-full h-full object-contain">
+          </div>
+        </div>
+
+        <!-- Product Base -->
+        <div class="flex flex-col items-center gap-1.5 w-full md:w-1/3">
+          <span class="text-xs font-semibold text-gray-400">Sản Phẩm Đầu Vào</span>
+          <div class="w-full h-80 rounded-xl overflow-hidden border border-gray-800 bg-gray-900 flex items-center justify-center">
+            <img id="modalProductImg" src="" alt="Product" class="w-full h-full object-contain">
+          </div>
+        </div>
+
+        <!-- AI Styled Output -->
+        <div class="flex flex-col items-center gap-1.5 w-full md:w-1/3">
+          <span class="text-xs font-bold text-emerald-400 flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            Kết Quả Phối Đồ AI
+          </span>
+          <div class="w-full h-80 rounded-xl overflow-hidden border-2 border-emerald-500/50 bg-gray-900 flex items-center justify-center relative group">
+            <img id="modalResultImg" src="" alt="Result" class="w-full h-full object-contain">
+            <a id="modalDownloadBtn" href="#" download="fashion-edit.png" class="absolute bottom-3 right-3 bg-emerald-600 hover:bg-emerald-500 text-white p-2 rounded-lg shadow-lg flex items-center gap-1 text-xs font-bold transition-all">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              Tải ảnh này
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prompt Info Section -->
+      <div class="p-3 border-t border-gray-800 bg-gray-900/90 text-[11px] text-gray-400">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-semibold text-gray-300">Prompt Đã Dùng Để Sinh Outfit Này:</span>
+          <button id="btnCopyModalPrompt" class="text-brand-400 hover:text-brand-300 font-medium">Sao chép prompt</button>
+        </div>
+        <p id="modalPromptText" class="font-mono bg-gray-950 p-2 rounded border border-gray-800 max-h-20 overflow-y-auto text-[10px] text-gray-400 select-all"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings / API Key Modal -->
+  <div id="settingsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-5 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+          Cấu Hình Hệ Thống
+        </h3>
+        <button id="btnCloseSettingsModal" class="text-gray-400 hover:text-white">✕</button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-gray-300 mb-1">Mô hình AI sử dụng:</label>
+          <input type="text" value="gemini-3.1-flash-image (Nano Banana Flash)" readonly class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-gray-400 font-mono">
+          <p class="text-[10px] text-gray-500 mt-1">Chuyên dụng cho tác vụ Image-to-Image và biên tập ảnh người mẫu</p>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-gray-300 mb-1">Tùy chọn API Key (Nếu chạy bên ngoài):</label>
+          <input type="password" id="customApiKeyInput" placeholder="Mặc định sử dụng môi trường tự động cấp..." class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-gray-200 focus:outline-none focus:border-brand-500 font-mono">
+          <p class="text-[10px] text-gray-500 mt-1">Trong Canvas, hệ thống tự cấp key tự động. Bạn chỉ cần nhập nếu chạy độc lập bên ngoài.</p>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-gray-300 mb-1">Độ phân giải & Tỉ lệ:</label>
+          <select id="aspectRatioSelect" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-gray-200 focus:outline-none focus:border-brand-500">
+            <option value="match_model" selected>Tự động giữ chuẩn tỷ lệ ảnh người mẫu (Khuyên dùng)</option>
+            <option value="3:4">Khung dọc 3:4</option>
+            <option value="9:16">Khung Story/TikTok 9:16</option>
+            <option value="1:1">Khung vuông 1:1</option>
+          </select>
+          <p class="text-[10px] text-gray-500 mt-1">Tab "Ghép Mẫu Vào Bối Cảnh" luôn tự lấy tỉ lệ theo ảnh bối cảnh.</p>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-gray-300 mb-1">Chất lượng xuất file:</label>
+          <select id="upscaleSelect" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-gray-200 focus:outline-none focus:border-brand-500">
+            <option value="match_original" selected>Tự động: xin model xuất 2K, sau đó nâng lên >= kích thước ảnh gốc</option>
+            <option value="4k">Ultra: xin model xuất 4K (nếu model hỗ trợ), sau đó nâng lên 2160px</option>
+            <option value="raw">Giữ nguyên ảnh thô của model (không nâng)</option>
+          </select>
+          <p class="text-[10px] text-amber-400 mt-1">⚠ Công cụ sẽ xin model xuất ảnh lớn hơn. Nếu model không hỗ trợ, tự động lùi về mặc định (~768px) rồi phóng to bằng canvas + làm nét. Phóng to không thêm chi tiết thật.</p>
+        </div>
+
+        <div class="pt-3 border-t border-gray-800 flex justify-end gap-2">
+          <button id="btnSaveSettings" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-lg">Lưu cấu hình</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      modelImage: null,
+      products: [],
+      isProcessing: false,
+      customApiKey: '',
+      aspectRatio: 'match_model',
+      upscaleMode: 'match_original',
+      results: []
+    };
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `p-3.5 rounded-xl border text-xs font-medium shadow-2xl flex items-center justify-between gap-3 transform transition-all duration-300 pointer-events-auto ${
+        type === 'error' ? 'bg-rose-950/90 text-rose-200 border-rose-800' :
+        type === 'success' ? 'bg-emerald-950/90 text-emerald-200 border-emerald-800' :
+        type === 'warning' ? 'bg-amber-950/90 text-amber-200 border-amber-800' :
+        'bg-gray-800/95 text-gray-100 border-gray-700'
+      }`;
+
+      const icon = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+      toast.innerHTML = `
+        <div class="flex items-center gap-2">
+          <span>${icon}</span>
+          <span>${message}</span>
+        </div>
+        <button class="text-gray-400 hover:text-white text-xs ml-2">✕</button>
+      `;
+
+      toast.querySelector('button').onclick = () => toast.remove();
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 4500);
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          const result = reader.result;
+          const base64Data = result.split(',')[1];
+          resolve({
+            base64: base64Data,
+            mimeType: file.type || 'image/jpeg',
+            dataUrl: result
+          });
+        };
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    const modelDropZone = document.getElementById('modelDropZone');
+    const modelInput = document.getElementById('modelInput');
+    const modelEmptyState = document.getElementById('modelEmptyState');
+    const modelPreviewContainer = document.getElementById('modelPreviewContainer');
+    const modelPreviewImg = document.getElementById('modelPreviewImg');
+    const modelFileName = document.getElementById('modelFileName');
+    const modelFileSize = document.getElementById('modelFileSize');
+
+    modelDropZone.addEventListener('click', (e) => {
+      if (e.target.id === 'btnChangeModel') {
+        modelInput.click();
+      } else if (e.target.id === 'btnRemoveModel') {
+        clearModel();
+      } else if (!state.modelImage) {
+        modelInput.click();
+      }
+    });
+
+    modelInput.addEventListener('change', async (e) => {
+      if (e.target.files && e.target.files[0]) {
+        await setModelImage(e.target.files[0]);
+      }
+    });
+
+    modelDropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      modelDropZone.classList.add('border-brand-500');
+    });
+
+    modelDropZone.addEventListener('dragleave', () => {
+      modelDropZone.classList.remove('border-brand-500');
+    });
+
+    modelDropZone.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      modelDropZone.classList.remove('border-brand-500');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        await setModelImage(e.dataTransfer.files[0]);
+      }
+    });
+
+    async function setModelImage(file) {
+      if (!file.type.startsWith('image/')) {
+        showToast('Vui lòng chọn tệp định dạng hình ảnh!', 'error');
+        return;
+      }
+      try {
+        const { base64, mimeType, dataUrl } = await fileToBase64(file);
+
+        const imgObj = new Image();
+        imgObj.src = dataUrl;
+        await new Promise(r => imgObj.onload = r);
+
+        state.modelImage = {
+          file,
+          base64,
+          mimeType,
+          url: dataUrl,
+          name: file.name,
+          size: file.size,
+          width: imgObj.naturalWidth,
+          height: imgObj.naturalHeight
+        };
+
+        modelPreviewImg.src = dataUrl;
+        modelFileName.textContent = `${file.name} (${imgObj.naturalWidth}×${imgObj.naturalHeight}px)`;
+        modelFileSize.textContent = formatFileSize(file.size);
+
+        modelEmptyState.classList.add('hidden');
+        modelPreviewContainer.classList.remove('hidden');
+        showToast(`Đã khóa ảnh Mẫu thành công (${imgObj.naturalWidth}px)!`, 'success');
+      } catch (err) {
+        showToast('Không thể đọc file ảnh: ' + err.message, 'error');
+      }
+    }
+
+    function clearModel() {
+      state.modelImage = null;
+      modelInput.value = '';
+      modelEmptyState.classList.remove('hidden');
+      modelPreviewContainer.classList.add('hidden');
+      showToast('Đã gỡ ảnh người mẫu', 'info');
+    }
+
+    const productDropZone = document.getElementById('productDropZone');
+    const productInput = document.getElementById('productInput');
+    const productsQueueList = document.getElementById('productsQueueList');
+    const emptyQueueMsg = document.getElementById('emptyQueueMsg');
+    const productCounter = document.getElementById('productCounter');
+    const btnClearProducts = document.getElementById('btnClearProducts');
+
+    productDropZone.addEventListener('click', () => productInput.click());
+
+    productInput.addEventListener('change', async (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        await addBatchProducts(Array.from(e.target.files));
+      }
+    });
+
+    productDropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      productDropZone.classList.add('border-indigo-500');
+    });
+
+    productDropZone.addEventListener('dragleave', () => {
+      productDropZone.classList.remove('border-indigo-500');
+    });
+
+    productDropZone.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      productDropZone.classList.remove('border-indigo-500');
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        await addBatchProducts(Array.from(e.dataTransfer.files));
+      }
+    });
+
+    btnClearProducts.addEventListener('click', () => {
+      state.products = [];
+      renderProductsQueue();
+      showToast('Đã xóa toàn bộ sản phẩm chờ phối', 'info');
+    });
+
+    async function addBatchProducts(files) {
+      const validImages = files.filter(f => f.type.startsWith('image/'));
+      if (validImages.length === 0) {
+        showToast('Không tìm thấy tệp ảnh hợp lệ!', 'warning');
+        return;
+      }
+
+      for (const file of validImages) {
+        const { base64, mimeType, dataUrl } = await fileToBase64(file);
+        state.products.push({
+          id: 'prod_' + Math.random().toString(36).substr(2, 9),
+          file,
+          base64,
+          mimeType,
+          url: dataUrl,
+          name: file.name,
+          size: file.size,
+          status: 'idle',
+          resultUrl: null,
+          promptUsed: '',
+          styleTag: ''
+        });
+      }
+      renderProductsQueue();
+      showToast(`Đã thêm ${validImages.length} sản phẩm vào hàng đợi!`, 'success');
+    }
+
+    function renderProductsQueue() {
+      productCounter.textContent = `${state.products.length} sản phẩm`;
+      if (state.products.length === 0) {
+        productsQueueList.innerHTML = `
+          <div id="emptyQueueMsg" class="h-full flex flex-col items-center justify-center text-gray-500 py-8 text-center">
+            <svg class="w-8 h-8 text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+            <p class="text-xs">Chưa có sản phẩm nào được tải lên</p>
+            <p class="text-[11px] text-gray-600">Mỗi ảnh sản phẩm sẽ được phối thành một outfit hoàn chỉnh</p>
+          </div>
+        `;
+        return;
+      }
+
+      productsQueueList.innerHTML = state.products.map((item) => {
+        const statusBadge =
+          item.status === 'pending' ? '<span class="text-[10px] text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/40 animate-pulse">Đang phối...</span>' :
+          item.status === 'success' ? '<span class="text-[10px] text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/40">✓ Xong</span>' :
+          item.status === 'error' ? '<span class="text-[10px] text-rose-400 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-800/40">Lỗi</span>' :
+          '<span class="text-[10px] text-gray-400 bg-gray-800 px-2 py-0.5 rounded">Chờ</span>';
+
+        return `
+          <div class="flex items-center justify-between p-2 bg-gray-900 rounded-lg border border-gray-800 hover:border-gray-700 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <img src="${item.url}" class="w-10 h-10 rounded-md object-cover border border-gray-700 shrink-0" alt="product">
+              <div class="min-w-0">
+                <p class="text-xs font-semibold text-gray-200 truncate">${item.name}</p>
+                <p class="text-[10px] text-gray-400">${formatFileSize(item.size)}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              ${statusBadge}
+              <button onclick="removeSingleProduct('${item.id}')" class="text-gray-500 hover:text-rose-400 p-1 transition-colors" title="Xóa món này">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function upscaleAndSharpenImage(dataUrl, targetWidth) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = dataUrl;
+        img.onload = () => {
+          const rawW = img.naturalWidth;
+          const rawH = img.naturalHeight;
+          const untouched = { url: dataUrl, width: rawW, height: rawH, rawWidth: rawW };
+
+          if (!targetWidth || rawW >= targetWidth) {
+            resolve(untouched);
+            return;
+          }
+
+          try {
+            const scale = targetWidth / rawW;
+            const targetHeight = Math.round(rawH * scale);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+            const w = targetWidth;
+            const h = targetHeight;
+            const radius = Math.max(0.8, scale * 0.8);
+            const blurCanvas = document.createElement('canvas');
+            blurCanvas.width = w;
+            blurCanvas.height = h;
+            const bctx = blurCanvas.getContext('2d', { willReadFrequently: true });
+
+            if ('filter' in bctx) {
+              bctx.filter = `blur(${radius}px)`;
+              bctx.drawImage(canvas, 0, 0);
+              const orig = ctx.getImageData(0, 0, w, h);
+              const blur = bctx.getImageData(0, 0, w, h);
+              const o = orig.data;
+              const b = blur.data;
+              const amount = 0.7;
+              const threshold = 2;
+              const m = Math.ceil(radius * 2);
+              for (let y = m; y < h - m; y++) {
+                for (let x = m; x < w - m; x++) {
+                  const i = (y * w + x) * 4;
+                  for (let c = 0; c < 3; c++) {
+                    const diff = o[i + c] - b[i + c];
+                    if (diff > threshold || diff < -threshold) {
+                      const v = o[i + c] + amount * diff;
+                      o[i + c] = v < 0 ? 0 : v > 255 ? 255 : v;
+                    }
+                  }
+                }
+              }
+              ctx.putImageData(orig, 0, 0);
+            } else {
+              const imgData = ctx.getImageData(0, 0, w, h);
+              const data = imgData.data;
+              const copy = new Uint8ClampedArray(data);
+              const weight = 0.35;
+              for (let y = 1; y < h - 1; y++) {
+                for (let x = 1; x < w - 1; x++) {
+                  const idx = (y * w + x) * 4;
+                  for (let c = 0; c < 3; c++) {
+                    const center = copy[idx + c];
+                    const up = copy[((y - 1) * w + x) * 4 + c];
+                    const down = copy[((y + 1) * w + x) * 4 + c];
+                    const left = copy[(y * w + (x - 1)) * 4 + c];
+                    const right = copy[(y * w + (x + 1)) * 4 + c];
+                    const sharpVal = center + weight * (4 * center - up - down - left - right);
+                    data[idx + c] = sharpVal < 0 ? 0 : sharpVal > 255 ? 255 : sharpVal;
+                  }
+                }
+              }
+              ctx.putImageData(imgData, 0, 0);
+            }
+
+            resolve({ url: canvas.toDataURL('image/png'), width: w, height: h, rawWidth: rawW });
+          } catch (e) {
+            console.error('Upscale failed, returning raw image', e);
+            resolve(untouched);
+          }
+        };
+        img.onerror = () => resolve({ url: dataUrl, width: 0, height: 0, rawWidth: 0 });
+      });
+    }
+
+    window.removeSingleProduct = function(id) {
+      state.products = state.products.filter(p => p.id !== id);
+      renderProductsQueue();
+    };
+
+    const STYLES_POOL = [
+      { name: "Urban Streetwear", promptMood: "trendy Seoul streetwear, effortless cool, subtle edge" },
+      { name: "Korean Minimal Chic", promptMood: "refined minimalist Korean aesthetic, clean neutral tones, elegant simplicity" },
+      { name: "Cozy Autumn Casual", promptMood: "cozy autumn warm vibes, comfortable relaxed layering" },
+      { name: "Sporty Active Casual", promptMood: "sporty everyday athleisure, energetic and modern" },
+      { name: "Vintage 90s Retro", promptMood: "90s nostalgic casual vintage, authentic washed textures" },
+      { name: "Sweet Casual Weekend", promptMood: "soft relaxed weekend brunch vibe, youthful and approachable" }
+    ];
+
+    const COMPLEMENTARY_BOTTOMS = [
+      "relaxed wide-leg vintage washed denim jeans",
+      "straight-leg tailored charcoal trousers",
+      "high-waisted casual cream linen pants",
+      "vintage pleated A-line skirt",
+      "relaxed-fit carpenter pants in muted beige",
+      "clean dark indigo raw-hem straight jeans"
+    ];
+
+    const COMPLEMENTARY_TOPS = [
+      "a clean relaxed oversized premium cotton tee",
+      "a light textured waffle-knit crop sweater",
+      "a vintage washed graphic baby tee",
+      "a boxy minimalist oxford button-down shirt worn open",
+      "a cozy oversized crewneck fleece sweater"
+    ];
+
+    const ACCESSORY_DATABASE = {
+      caps_beanies: [
+        "a vintage washed baseball cap worn casually",
+        "a relaxed fitted beanie",
+        "a casual minimal bucket hat"
+      ],
+      hair_clips: [
+        "a neutral-toned resin hair claw clipping half her hair up",
+        "a pair of subtle metallic aesthetic hairpins",
+        "a slim minimal fabric headband"
+      ],
+      glasses: [
+        "retro tortoiseshell sunglasses casually pushed up on top of her head",
+        "thin wire-rim everyday reading glasses worn naturally",
+        "sleek black rectangular sunglasses resting on her head"
+      ],
+      bags_backpack: [
+        "a casual durable canvas tote bag slung naturally over one shoulder",
+        "a sleek small nylon crossbody bag resting at her waist",
+        "a lightweight mini backpack worn over both shoulders"
+      ],
+      scarves: [
+        "a lightweight soft knit textured scarf loosely draped once around her neck",
+        "a cozy brushed wool winter muffler draped loosely without covering her chin"
+      ],
+      jewelry: [
+        "a delicate thin layered gold chain necklace and simple hoop earrings",
+        "a minimal silver pendant necklace with simple everyday rings"
+      ]
+    };
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function generateCreativePrompt(productItem) {
+      const moodSetting = document.getElementById('styleMoodSelect').value;
+      let chosenMood;
+      if (moodSetting === 'auto') {
+        chosenMood = pickRandom(STYLES_POOL);
+      } else {
+        const found = STYLES_POOL.find(s => s.name.toLowerCase().includes(moodSetting.replace('_', ' ')));
+        chosenMood = found || STYLES_POOL[0];
+      }
+
+      const checkedBoxes = Array.from(document.querySelectorAll('.acc-item:checked')).map(cb => cb.value);
+
+      const count = Math.floor(Math.random() * 3);
+      const selectedAccs = [];
+      if (checkedBoxes.length > 0 && count > 0) {
+        const shuffledPool = [...checkedBoxes].sort(() => 0.5 - Math.random());
+        for (let i = 0; i < Math.min(count, shuffledPool.length); i++) {
+          const category = shuffledPool[i];
+          if (ACCESSORY_DATABASE[category]) {
+            selectedAccs.push(pickRandom(ACCESSORY_DATABASE[category]));
+          }
+        }
+      }
+
+      const accessoriesSentence = selectedAccs.length > 0
+        ? `Styling accents: Add ${selectedAccs.join(', ')}. Keep them completely natural, never covering her facial features or eyes.`
+        : `Zero extra accessories—clean, minimalist, natural everyday styling.`;
+
+      const promptText = `Direct photo garment replacement of Image 1 using the product from Image 2.
+
+[CRITICAL: ANCHOR IMAGE 1 AS PIXEL REFERENCE]:
+- Retain the exact model identity from Image 1: identical facial bone structure, natural skin undertone, facial birthmark/beauty marks, eye shape, nose, teeth, hair parting, hair length, body pose, hand placement, and camera distance/angle/framing.
+- Room environment, door handles, floor grain, wall texture, and lighting direction must match Image 1 with zero recomposition.
+
+[GARMENT REPLACEMENT (FROM IMAGE 2)]:
+- Dress her in the exact piece from Image 2. Reproduce exact fabric weave, color saturation, tactile textures, buttons/zippers, seams, collar cut, and organic folding shadows over her body.
+- Intelligently coordinate complementary bottom or top to complete a fashionable look:
+  - If Image 2 is a Top: Pair with ${pickRandom(COMPLEMENTARY_BOTTOMS)}.
+  - If Image 2 is a Bottom: Pair with ${pickRandom(COMPLEMENTARY_TOPS)}.
+  - If Image 2 is a Dress: Complete with natural matching footwear.
+
+[STYLE & ACCESSORIES]:
+- Style direction: ${chosenMood.name} (${chosenMood.promptMood}).
+- ${accessoriesSentence}
+
+[TEXTURE & OPTICAL FIDELITY - ANTI-PLASTIC DIRECTIVE]:
+- Shot on iPhone 15 Pro main camera (24mm, f/1.78), natural daylight coming from the side window.
+- NO beauty filters, NO airbrushing, NO skin smoothing, NO synthetic plastic sheen, NO oversaturated pink/orange skin tints.
+- Render authentic micro-textures: crisp individual hair strands, micro-pores on skin, crisp fabric threads, authentic clothing creases, and sharp background room geometry matching the optical crispness of Image 1.`;
+
+      return {
+        prompt: promptText,
+        styleTag: chosenMood.name,
+        accessoriesUsed: selectedAccs
+      };
+    }
+
+    const SUPPORTED_RATIOS = {
+      '1:1': 1, '2:3': 2 / 3, '3:2': 3 / 2, '3:4': 3 / 4, '4:3': 4 / 3,
+      '4:5': 4 / 5, '5:4': 5 / 4, '9:16': 9 / 16, '16:9': 16 / 9, '21:9': 21 / 9
+    };
+
+    function nearestAspectRatio(w, h) {
+      const target = w / h;
+      let best = '1:1';
+      let bestDiff = Infinity;
+      for (const [name, value] of Object.entries(SUPPORTED_RATIOS)) {
+        const d = Math.abs(Math.log(value / target));
+        if (d < bestDiff) { bestDiff = d; best = name; }
+      }
+      return best;
+    }
+
+    function resolveImageConfig() {
+      const ratioSetting = document.getElementById('aspectRatioSelect')?.value || 'match_model';
+      const upscaleSetting = document.getElementById('upscaleSelect')?.value || 'match_original';
+
+      let aspectRatio;
+      if (ratioSetting === 'match_model') {
+        if (state.modelImage?.width && state.modelImage?.height) {
+          aspectRatio = nearestAspectRatio(state.modelImage.width, state.modelImage.height);
+        }
+      } else {
+        aspectRatio = ratioSetting;
+      }
+
+      const imageSize = upscaleSetting === '4k' ? '4K' : upscaleSetting === 'match_original' ? '2K' : '1K';
+      return { aspectRatio, imageSize };
+    }
+
+    async function callGeminiImageEdit(modelBase64, modelMime, productBase64, productMime, promptText) {
+      const customKey = document.getElementById('customApiKeyInput').value.trim();
+      const apiKey = customKey || "";
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+
+      const parts = [
+        { text: promptText },
+        { inlineData: { mimeType: modelMime, data: modelBase64 } },
+        { inlineData: { mimeType: productMime, data: productBase64 } }
+      ];
+
+      const wanted = resolveImageConfig();
+      const configLevels = [
+        { ...(wanted.aspectRatio ? { aspectRatio: wanted.aspectRatio } : {}), imageSize: wanted.imageSize },
+        wanted.aspectRatio ? { aspectRatio: wanted.aspectRatio } : null,
+        null
+      ];
+      let level = 0;
+
+      function buildPayload() {
+        const generationConfig = { responseModalities: ['IMAGE'] };
+        if (configLevels[level]) generationConfig.imageConfig = configLevels[level];
+        return { contents: [{ role: "user", parts }], generationConfig };
+      }
+
+      const maxRetries = 3;
+      let attempt = 0;
+      let delay = 1500;
+      while (true) {
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(buildPayload())
+          });
+
+          if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error?.message || `HTTP ${response.status}: Lỗi kết nối API`);
+          }
+
+          const result = await response.json();
+          const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+
+          if (!part || !part.inlineData) {
+            throw new Error("Không nhận được dữ liệu ảnh trả về từ model.");
+          }
+
+          return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+        } catch (err) {
+          const looksLikeConfigError = /image_?size|image_?config|aspect_?ratio|unknown name|invalid json payload|invalid argument|not supported/i.test(err.message || '');
+          if (looksLikeConfigError && level < configLevels.length - 1) {
+            level++;
+            showToast(level === 1
+              ? 'Model không nhận tham số imageSize, thử lại chỉ với tỉ lệ khung...'
+              : 'Model không nhận imageConfig, quay về cấu hình mặc định (~768px).', 'warning');
+            continue;
+          }
+          attempt++;
+          if (attempt >= maxRetries) throw err;
+          await new Promise(r => setTimeout(r, delay));
+          delay *= 2;
+        }
+      }
+    }
+
+    const btnStartBatch = document.getElementById('btnStartBatch');
+    const spinnerBatch = document.getElementById('spinnerBatch');
+    const sparkleBatchIcon = document.getElementById('sparkleBatchIcon');
+    const btnBatchText = document.getElementById('btnBatchText');
+    const resultsEmptyState = document.getElementById('resultsEmptyState');
+    const cardsContainer = document.getElementById('cardsContainer');
+    const resultCountBadge = document.getElementById('resultCountBadge');
+    const btnDownloadAll = document.getElementById('btnDownloadAll');
+
+    btnStartBatch.addEventListener('click', async () => {
+      if (!state.modelImage) {
+        showToast('Vui lòng tải lên ảnh Người Mẫu cố định trước!', 'warning');
+        return;
+      }
+      if (state.products.length === 0) {
+        showToast('Vui lòng thêm ít nhất 1 ảnh sản phẩm cần mặc!', 'warning');
+        return;
+      }
+
+      state.isProcessing = true;
+      updateBatchButtonUI(true);
+
+      const statusBadgeText = document.getElementById('statusBadgeText');
+      statusBadgeText.textContent = `Đang phối ${state.products.length} sản phẩm...`;
+
+      showToast(`Bắt đầu xử lý hàng loạt ${state.products.length} sản phẩm...`, 'info');
+
+      for (let i = 0; i < state.products.length; i++) {
+        const product = state.products[i];
+        product.status = 'pending';
+        renderProductsQueue();
+
+        const { prompt, styleTag } = generateCreativePrompt(product);
+        product.promptUsed = prompt;
+        product.styleTag = styleTag;
+
+        try {
+          const rawGeneratedUrl = await callGeminiImageEdit(
+            state.modelImage.base64,
+            state.modelImage.mimeType,
+            product.base64,
+            product.mimeType,
+            prompt
+          );
+
+          const upscaleSetting = document.getElementById('upscaleSelect')?.value || 'match_original';
+          let targetWidth = 1109;
+          if (upscaleSetting === 'match_original' && state.modelImage?.width) {
+            targetWidth = Math.max(1109, state.modelImage.width);
+          } else if (upscaleSetting === '4k') {
+            targetWidth = 2160;
+          } else if (upscaleSetting === 'raw') {
+            targetWidth = 0;
+          }
+
+          const upscaled = await upscaleAndSharpenImage(rawGeneratedUrl, targetWidth);
+          const generatedImageUrl = upscaled.url;
+          const resolutionText = upscaled.width !== upscaled.rawWidth
+            ? `${upscaled.rawWidth}px → ${upscaled.width}px (phóng to)`
+            : `${upscaled.width}px (gốc từ AI)`;
+
+          product.status = 'success';
+          product.resultUrl = generatedImageUrl;
+
+          state.results.unshift({
+            id: 'res_' + Math.random().toString(36).substr(2, 9),
+            modelUrl: state.modelImage.url,
+            productUrl: product.url,
+            productName: product.name,
+            resultUrl: generatedImageUrl,
+            promptUsed: prompt,
+            styleTag: styleTag,
+            resolutionText: resolutionText,
+            createdAt: new Date().toLocaleTimeString()
+          });
+
+          renderResultsGrid();
+          showToast(`Đã phối xong (${resolutionText}): ${product.name}`, 'success');
+        } catch (error) {
+          console.error(error);
+          product.status = 'error';
+          showToast(`Lỗi khi phối sản phẩm #${i + 1} (${product.name}): ${error.message}`, 'error');
+        }
+
+        renderProductsQueue();
+      }
+
+      state.isProcessing = false;
+      updateBatchButtonUI(false);
+      statusBadgeText.textContent = `Hoàn tất tất cả`;
+      showToast('Đã hoàn tất toàn bộ hàng đợi phối đồ!', 'success');
+    });
+
+    function updateBatchButtonUI(isBusy) {
+      if (isBusy) {
+        btnStartBatch.disabled = true;
+        spinnerBatch.classList.remove('hidden');
+        sparkleBatchIcon.classList.add('hidden');
+        btnBatchText.textContent = "AI đang phối đồ & render...";
+      } else {
+        btnStartBatch.disabled = false;
+        spinnerBatch.classList.add('hidden');
+        sparkleBatchIcon.classList.remove('hidden');
+        btnBatchText.textContent = "Bắt đầu Thay Đồ & Phối Hàng Loạt";
+      }
+    }
+
+    function renderResultsGrid() {
+      resultCountBadge.textContent = `${state.results.length} kết quả`;
+
+      if (state.results.length === 0) {
+        resultsEmptyState.classList.remove('hidden');
+        cardsContainer.classList.add('hidden');
+        btnDownloadAll.disabled = true;
+        return;
+      }
+
+      resultsEmptyState.classList.add('hidden');
+      cardsContainer.classList.remove('hidden');
+      btnDownloadAll.disabled = false;
+      cardsContainer.innerHTML = '';
+
+      state.results.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'bg-gray-900 border border-gray-800 rounded-xl overflow-hidden shadow-lg flex flex-col group hover:border-brand-500/50 transition-all';
+
+        card.innerHTML = `
+          <div class="relative aspect-[3/4] bg-black overflow-hidden cursor-pointer" onclick="openPreviewModal('${item.id}')">
+            <img src="${item.resultUrl}" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300" alt="Generated Fashion Look">
+
+            <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+              <span class="bg-black/70 backdrop-blur-md text-[10px] font-bold text-white px-2 py-0.5 rounded-full border border-white/10">FIXED CAM</span>
+              <span class="bg-brand-600/80 backdrop-blur-md text-[10px] font-bold text-white px-2 py-0.5 rounded-full">${item.styleTag}</span>
+            </div>
+
+            <div class="absolute bottom-2.5 left-2.5 flex items-center gap-2 bg-gray-900/80 backdrop-blur-md border border-gray-700/60 p-1.5 rounded-lg max-w-[80%]">
+              <img src="${item.productUrl}" class="w-7 h-7 rounded object-cover border border-gray-600">
+              <div class="min-w-0 pr-1">
+                <p class="text-[10px] font-semibold text-gray-200 truncate">${item.productName}</p>
+                <p class="text-[9px] text-emerald-400 font-bold">${item.resolutionText || ''}</p>
+              </div>
+            </div>
+
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+              <span class="bg-brand-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                Xem chi tiết & đối chiếu
+              </span>
+            </div>
+          </div>
+
+          <div class="p-3 border-t border-gray-800 flex items-center justify-between text-xs bg-gray-900/90">
+            <span class="text-gray-400 text-[10px]">${item.createdAt}</span>
+            <div class="flex items-center gap-2">
+              <button onclick="copyCardPrompt('${item.id}')" class="text-gray-400 hover:text-white p-1" title="Sao chép prompt này">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+              </button>
+              <a href="${item.resultUrl}" download="model-outfit-${item.id}.png" class="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 rounded-md text-[11px] font-semibold flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Tải ảnh
+              </a>
+            </div>
+          </div>
+        `;
+
+        cardsContainer.appendChild(card);
+      });
+    }
+
+    const previewModal = document.getElementById('previewModal');
+    const btnClosePreviewModal = document.getElementById('btnClosePreviewModal');
+    const modalModelImg = document.getElementById('modalModelImg');
+    const modalProductImg = document.getElementById('modalProductImg');
+    const modalResultImg = document.getElementById('modalResultImg');
+    const modalStyleTag = document.getElementById('modalStyleTag');
+    const modalPromptText = document.getElementById('modalPromptText');
+    const modalDownloadBtn = document.getElementById('modalDownloadBtn');
+    const btnCopyModalPrompt = document.getElementById('btnCopyModalPrompt');
+
+    window.openPreviewModal = function(id) {
+      const item = state.results.find(r => r.id === id);
+      if (!item) return;
+
+      modalModelImg.src = item.modelUrl;
+      modalProductImg.src = item.productUrl;
+      modalResultImg.src = item.resultUrl;
+      modalStyleTag.textContent = item.styleTag;
+      modalPromptText.textContent = item.promptUsed;
+      modalDownloadBtn.href = item.resultUrl;
+      modalDownloadBtn.download = `look-${item.id}.png`;
+
+      previewModal.classList.remove('hidden');
+    };
+
+    btnClosePreviewModal.addEventListener('click', () => previewModal.classList.add('hidden'));
+
+    btnCopyModalPrompt.addEventListener('click', () => {
+      const text = modalPromptText.textContent;
+      navigator.clipboard?.writeText ? navigator.clipboard.writeText(text) : copyFallback(text);
+      showToast('Đã sao chép prompt vào Clipboard!', 'success');
+    });
+
+    window.copyCardPrompt = function(id) {
+      const item = state.results.find(r => r.id === id);
+      if (!item) return;
+      navigator.clipboard?.writeText ? navigator.clipboard.writeText(item.promptUsed) : copyFallback(item.promptUsed);
+      showToast('Đã sao chép prompt của outfit này!', 'success');
+    };
+
+    function copyFallback(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+
+    btnDownloadAll.addEventListener('click', () => {
+      if (state.results.length === 0) return;
+      showToast(`Đang chuẩn bị tải xuống ${state.results.length} ảnh...`, 'info');
+      state.results.forEach((item, index) => {
+        setTimeout(() => {
+          const a = document.createElement('a');
+          a.href = item.resultUrl;
+          a.download = `fashion-look-${index + 1}-${item.styleTag.replace(/\s+/g, '-').toLowerCase()}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }, index * 400);
+      });
+    });
+
+    document.getElementById('btnClearResults').addEventListener('click', () => {
+      state.results = [];
+      renderResultsGrid();
+      showToast('Đã xóa danh sách kết quả', 'info');
+    });
+
+    const btnSettingsModal = document.getElementById('btnSettingsModal');
+    const settingsModal = document.getElementById('settingsModal');
+    const btnCloseSettingsModal = document.getElementById('btnCloseSettingsModal');
+    const btnSaveSettings = document.getElementById('btnSaveSettings');
+
+    btnSettingsModal.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+    btnCloseSettingsModal.addEventListener('click', () => settingsModal.classList.add('hidden'));
+    btnSaveSettings.addEventListener('click', () => {
+      state.customApiKey = document.getElementById('customApiKeyInput').value.trim();
+      settingsModal.classList.add('hidden');
+      showToast('Đã lưu cài đặt thành công!', 'success');
+    });
+
+    const IMAGE_MODEL_NAME = 'gemini-3.1-flash-image';
+    const ANALYSIS_MODEL_NAME = 'gemini-2.5-flash';
+
+    const sceneState = {
+      model: null,
+      scenes: [],
+      results: [],
+      isProcessing: false
+    };
+
+    function switchTab(name) {
+      const isScene = name === 'scene';
+      document.getElementById('panelOutfit').classList.toggle('tab-hidden', isScene);
+      document.getElementById('panelScene').classList.toggle('tab-hidden', !isScene);
+      const activeCls = ['text-white', 'border-brand-500', 'bg-gray-900'];
+      const idleCls = ['text-gray-400', 'border-transparent'];
+      [['tabBtnOutfit', !isScene], ['tabBtnScene', isScene]].forEach((pair) => {
+        const el = document.getElementById(pair[0]);
+        activeCls.forEach(c => el.classList.toggle(c, pair[1]));
+        idleCls.forEach(c => el.classList.toggle(c, !pair[1]));
+      });
+    }
+
+    document.getElementById('tabBtnOutfit').addEventListener('click', () => switchTab('outfit'));
+    document.getElementById('tabBtnScene').addEventListener('click', () => switchTab('scene'));
+
+    async function loadImageMeta(file) {
+      const { base64, mimeType, dataUrl } = await fileToBase64(file);
+      const img = new Image();
+      img.src = dataUrl;
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+      return {
+        file,
+        base64,
+        mimeType,
+        url: dataUrl,
+        name: file.name,
+        size: file.size,
+        width: img.naturalWidth,
+        height: img.naturalHeight
+      };
+    }
+
+    const sModelZone = document.getElementById('sModelDropZone');
+    const sModelInput = document.getElementById('sModelInput');
+    const sModelEmpty = document.getElementById('sModelEmpty');
+    const sModelPreview = document.getElementById('sModelPreview');
+    const sModelImg = document.getElementById('sModelImg');
+    const sModelName = document.getElementById('sModelName');
+    const sModelSize = document.getElementById('sModelSize');
+
+    async function setSceneModel(file) {
+      if (!file || !file.type.startsWith('image/')) {
+        showToast('Vui lòng chọn tệp định dạng hình ảnh!', 'error');
+        return;
+      }
+      try {
+        const meta = await loadImageMeta(file);
+        sceneState.model = meta;
+        sModelImg.src = meta.url;
+        sModelName.textContent = `${meta.name} (${meta.width}×${meta.height}px)`;
+        sModelSize.textContent = formatFileSize(meta.size);
+        sModelEmpty.classList.add('hidden');
+        sModelPreview.classList.remove('hidden');
+        showToast('Đã nạp ảnh Người Mẫu!', 'success');
+      } catch (err) {
+        showToast('Không thể đọc file ảnh: ' + err.message, 'error');
+      }
+    }
+
+    function clearSceneModel() {
+      sceneState.model = null;
+      sModelInput.value = '';
+      sModelEmpty.classList.remove('hidden');
+      sModelPreview.classList.add('hidden');
+      showToast('Đã gỡ ảnh người mẫu', 'info');
+    }
+
+    sModelZone.addEventListener('click', (e) => {
+      if (e.target === sModelInput) return;
+      if (e.target.closest('#sBtnChangeModel')) {
+        sModelInput.click();
+        return;
+      }
+      if (e.target.closest('#sBtnRemoveModel')) {
+        clearSceneModel();
+        return;
+      }
+      if (!sceneState.model) sModelInput.click();
+    });
+
+    sModelInput.addEventListener('change', async (e) => {
+      if (e.target.files && e.target.files[0]) await setSceneModel(e.target.files[0]);
+    });
+
+    sModelZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      sModelZone.classList.add('border-brand-500');
+    });
+    sModelZone.addEventListener('dragleave', () => sModelZone.classList.remove('border-brand-500'));
+    sModelZone.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      sModelZone.classList.remove('border-brand-500');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) await setSceneModel(e.dataTransfer.files[0]);
+    });
+
+    const sceneDropZone = document.getElementById('sceneDropZone');
+    const sceneInput = document.getElementById('sceneInput');
+    const sceneList = document.getElementById('sceneList');
+    const sceneCounter = document.getElementById('sceneCounter');
+
+    async function addScenes(files) {
+      const images = files.filter(f => f.type.startsWith('image/'));
+      if (images.length === 0) {
+        showToast('Không tìm thấy tệp ảnh hợp lệ!', 'warning');
+        return;
+      }
+      let added = 0;
+      for (const file of images) {
+        try {
+          const meta = await loadImageMeta(file);
+          sceneState.scenes.push({
+            id: 'scn_' + Math.random().toString(36).substr(2, 9),
+            ...meta,
+            status: 'idle',
+            analysis: ''
+          });
+          added++;
+        } catch (err) {
+          showToast('Không đọc được ảnh: ' + file.name, 'error');
+        }
+      }
+      renderScenes();
+      if (added > 0) showToast(`Đã thêm ${added} ảnh bối cảnh!`, 'success');
+    }
+
+    function renderScenes() {
+      sceneCounter.textContent = `${sceneState.scenes.length} bối cảnh`;
+      if (sceneState.scenes.length === 0) {
+        sceneList.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-gray-500 py-8 text-center">
+            <p class="text-xs">Chưa có ảnh bối cảnh nào</p>
+            <p class="text-[11px] text-gray-600">Người trong ảnh sẽ được thay bằng mẫu của bạn, giữ dáng và góc máy</p>
+          </div>
+        `;
+        return;
+      }
+      sceneList.innerHTML = sceneState.scenes.map((item) => {
+        const badge =
+          item.status === 'pending' ? '<span class="text-[10px] text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/40 animate-pulse">Đang ghép...</span>' :
+          item.status === 'success' ? '<span class="text-[10px] text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/40">✓ Xong</span>' :
+          item.status === 'error' ? '<span class="text-[10px] text-rose-400 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-800/40">Lỗi</span>' :
+          '<span class="text-[10px] text-gray-400 bg-gray-800 px-2 py-0.5 rounded">Chờ</span>';
+        return `
+          <div class="flex items-center justify-between p-2 bg-gray-900 rounded-lg border border-gray-800 hover:border-gray-700 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <img src="${item.url}" class="w-10 h-12 rounded-md object-cover border border-gray-700 shrink-0" alt="scene">
+              <div class="min-w-0">
+                <p class="text-xs font-semibold text-gray-200 truncate">${item.name}</p>
+                <p class="text-[10px] text-gray-400">${item.width}×${item.height}px • ${formatFileSize(item.size)}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              ${badge}
+              <button type="button" onclick="removeScene('${item.id}')" class="text-gray-500 hover:text-rose-400 p-1 transition-colors" title="Xóa bối cảnh này">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.removeScene = function(id) {
+      sceneState.scenes = sceneState.scenes.filter(s => s.id !== id);
+      renderScenes();
+    };
+
+    sceneDropZone.addEventListener('click', (e) => {
+      if (e.target === sceneInput) return;
+      sceneInput.click();
+    });
+    sceneInput.addEventListener('change', async (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        await addScenes(Array.from(e.target.files));
+        sceneInput.value = '';
+      }
+    });
+    sceneDropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      sceneDropZone.classList.add('border-indigo-500');
+    });
+    sceneDropZone.addEventListener('dragleave', () => sceneDropZone.classList.remove('border-indigo-500'));
+    sceneDropZone.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      sceneDropZone.classList.remove('border-indigo-500');
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) await addScenes(Array.from(e.dataTransfer.files));
+    });
+
+    document.getElementById('sBtnClearScenes').addEventListener('click', () => {
+      sceneState.scenes = [];
+      renderScenes();
+      showToast('Đã xóa toàn bộ ảnh bối cảnh', 'info');
+    });
+
+    function readSceneOptions() {
+      return {
+        realism: document.getElementById('sceneRealism').value,
+        expression: document.getElementById('sceneExpression').value,
+        removeHeld: document.getElementById('sceneRemoveHeld').checked,
+        note: document.getElementById('sceneNote').value.trim()
+      };
+    }
+
+    async function analyzeScene(scene) {
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${ANALYSIS_MODEL_NAME}:generateContent?key=${document.getElementById('customApiKeyInput').value.trim()}`;
+      const instruction = 'You are a photography lighting analyst preparing a photo composite. Study this photo and answer in concise English bullet points, maximum 140 words total: (1) time of day and type of light; (2) direction of the main light relative to the camera and to the person: front, behind, left, right, above, and whether it is hard or soft; (3) where the cast shadows fall (direction, length, softness) and on what surface; (4) overall colour temperature and colour cast, plus bounce colours from nearby surfaces such as grass, floor, walls or water; (5) camera height, angle, lens feel, depth of field and grain level; (6) the pose and body orientation of the person; (7) any reflective surface or foreground object that overlaps the person. Describe only what is visible. Do not mention any identity.';
+      const payload = {
+        contents: [{
+          role: 'user',
+          parts: [
+            { text: instruction },
+            { inlineData: { mimeType: scene.mimeType, data: scene.base64 } }
+          ]
+        }]
+      };
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error?.message || `HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      const text = (data?.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('').trim();
+      if (!text) throw new Error('Không có nội dung phân tích');
+      return text;
+    }
+
+    function buildScenePrompt(opts, analysis) {
+      const expressionLine = opts.expression === 'copy_reference'
+        ? 'Expression: copy the facial expression and gaze direction of the person in Image 2, while keeping the identity of the person in Image 1.'
+        : 'Expression: keep the natural, soft expression of the person in Image 1 (same smile level and eyes), adapted to the head angle of Image 2.';
+
+      const heldLine = opts.removeHeld
+        ? 'Objects: do not carry over any handheld object from Image 1 (phone, cup, etc.). Her hands are empty and relaxed, unless the pose in Image 2 holds something, which you may then reproduce naturally.'
+        : 'Objects: keep a handheld object from Image 1 only if it fits the pose of Image 2.';
+
+      const lines = [];
+      lines.push('Image 1 is my model, the person to insert. Image 2 is a reference photo of a different person standing in a real location. Create ONE photorealistic photo that has the location, camera, framing, lighting and pose of Image 2, but with the person from Image 1 in it instead of the original person.');
+      lines.push('');
+      lines.push('[KEEP EXACTLY FROM IMAGE 1 - THE PERSON]');
+      lines.push('- Identity: identical face shape, eyes, eyebrows, nose, lips, skin tone and any beauty marks. The same real person, not a lookalike. Do not beautify, slim or alter any feature.');
+      lines.push('- Hair: same style, colour, length and parting as in Image 1.');
+      lines.push('- Body: same figure, shoulders, arms, waist and proportions as in Image 1. Do not copy the body shape of the person in Image 2.');
+      lines.push('- Outfit: the complete outfit exactly as worn in Image 1: every garment, colour, fabric, pattern, print and logo, plus all accessories such as jewelry, watch, nails and bag. Do NOT dress her in the outfit of Image 2. If Image 2 shows more of the body than Image 1 (legs, feet), complete those parts naturally with items that match her outfit style, such as matching footwear.');
+      lines.push('- ' + expressionLine);
+      lines.push('- ' + heldLine);
+      lines.push('');
+      lines.push('[TAKE EXACTLY FROM IMAGE 2 - THE SCENE]');
+      lines.push('- Location and background: keep every object, building, plant, line and sign exactly as it is. Do not redesign or relocate anything.');
+      lines.push('- Camera: same framing, crop, camera height, angle, perspective, horizon line and lens distance. Same aspect ratio.');
+      lines.push('- Pose: copy the pose of the person in Image 2 exactly: body orientation, head tilt, gaze direction, arm and hand positions, leg stance and weight distribution. Same position and scale in the frame.');
+      lines.push('- Remove the original person of Image 2 completely, with nothing of her left behind: no hair, no clothing, no limbs, no shadow of her and no leftover edges.');
+      lines.push('');
+      lines.push('[LIGHTING AND PHYSICAL INTEGRATION - CRITICAL]');
+      lines.push('- Relight the person from Image 1 with the real lighting of Image 2. Find the main light source in Image 2 and match its direction, hardness, colour temperature and intensity on her face, hair, skin and clothes.');
+      lines.push('- Light logic: if the subject in Image 2 is lit from the front, the light source is behind the camera, so her cast shadow falls behind her onto the ground and wall behind. If the subject is backlit, add a rim light on hair and shoulders and keep the front of her darker. If light comes from one side, put the shadow on the opposite side.');
+      lines.push('- Add a soft contact shadow where her feet, legs or body touch the ground, darkest at the contact point and fading with distance. Cast shadows must follow the same direction and softness as the other shadows in the scene.');
+      lines.push('- Add environmental bounce light: nearby surfaces such as grass, floor, walls, sand or water tint her skin and clothes slightly with their colour, mainly on the underside of chin, arms and legs.');
+      lines.push('- Match the white balance and exposure of Image 2. A night photo should look dark and moody on her too, with no studio-bright face. Do not make her skin paler, pinker or brighter than the scene around her.');
+      lines.push('- If Image 2 contains reflective surfaces (mirror, glass, water), reflect her there. If objects in Image 2 overlap the person (railing, plants, table, hair of others), keep them overlapping her in the same way.');
+
+      if (analysis) {
+        lines.push('');
+        lines.push('[LIGHT ANALYSIS OF IMAGE 2 - USE THIS AS GROUND TRUTH FOR LIGHTING]');
+        lines.push(analysis);
+      }
+
+      lines.push('');
+      lines.push('[CAMERA REALISM - ANTI-FAKE DIRECTIVE]');
+      lines.push('- Shot on the same phone camera as Image 2: same grain, noise, sharpness, softness, lens depth of field and compression across the whole image. Her face and clothes must be no sharper or cleaner than the background.');
+      lines.push('- NO beauty filter, NO airbrushing, NO plastic or waxy skin. Natural skin texture with pores and fine peach fuzz, slightly uneven skin tone and natural shine.');
+      lines.push('- Fabric folds, tension and drape must follow the new pose and the light. Hair edges must be soft and natural with a few flyaway strands overlapping the background, with no cutout line and no halo.');
+
+      if (opts.realism === 'high') {
+        lines.push('- Final checklist before output: (1) every shadow agrees with one light direction; (2) contact shadow present; (3) bounce colour from the environment visible on her; (4) skin, clothes and background share one colour temperature; (5) same grain and sharpness everywhere; (6) soft natural hair and shoulder edges; (7) depth of field consistent with the distance of the background; (8) real skin and fabric detail; (9) perspective and scale match the camera height of Image 2; (10) natural highlights and true dark areas, not evenly lit.');
+      }
+
+      if (opts.note) {
+        lines.push('');
+        lines.push('[EXTRA INSTRUCTIONS FROM THE USER]');
+        lines.push(opts.note);
+      }
+
+      lines.push('');
+      lines.push('Output a single photo with the same aspect ratio and framing as Image 2. No text, no watermark, no collage, no side-by-side. Exactly one main subject, the person from Image 1. Keep any unrelated people in the background of Image 2 as they are.');
+      return lines.join('\n');
+    }
+
+    async function callImageModel(parts, aspectRatio) {
+      const apiKey = document.getElementById('customApiKeyInput').value.trim();
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${IMAGE_MODEL_NAME}:generateContent?key=${apiKey}`;
+      const upscaleSetting = document.getElementById('upscaleSelect')?.value || 'match_original';
+      const imageSize = upscaleSetting === '4k' ? '4K' : upscaleSetting === 'match_original' ? '2K' : '1K';
+
+      const configLevels = [
+        { ...(aspectRatio ? { aspectRatio } : {}), imageSize },
+        aspectRatio ? { aspectRatio } : null,
+        null
+      ];
+      let level = 0;
+
+      function buildPayload() {
+        const generationConfig = { responseModalities: ['IMAGE'] };
+        if (configLevels[level]) generationConfig.imageConfig = configLevels[level];
+        return { contents: [{ role: 'user', parts }], generationConfig };
+      }
+
+      const maxRetries = 3;
+      let attempt = 0;
+      let delay = 1500;
+      while (true) {
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(buildPayload())
+          });
+
+          if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error?.message || `HTTP ${response.status}: Lỗi kết nối API`);
+          }
+
+          const result = await response.json();
+          const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+          if (!part || !part.inlineData) {
+            throw new Error('Không nhận được dữ liệu ảnh trả về từ model.');
+          }
+          return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+        } catch (err) {
+          const looksLikeConfigError = /image_?size|image_?config|aspect_?ratio|unknown name|invalid json payload|invalid argument|not supported/i.test(err.message || '');
+          if (looksLikeConfigError && level < configLevels.length - 1) {
+            level++;
+            showToast(level === 1
+              ? 'Model không nhận tham số imageSize, thử lại chỉ với tỉ lệ khung...'
+              : 'Model không nhận imageConfig, quay về cấu hình mặc định (~768px).', 'warning');
+            continue;
+          }
+          attempt++;
+          if (attempt >= maxRetries) throw err;
+          await new Promise(r => setTimeout(r, delay));
+          delay *= 2;
+        }
+      }
+    }
+
+    async function runSceneJob(scene) {
+      const opts = readSceneOptions();
+      const prompt = buildScenePrompt(opts, scene.analysis);
+      const aspectRatio = nearestAspectRatio(scene.width, scene.height);
+      const parts = [
+        { text: prompt },
+        { inlineData: { mimeType: sceneState.model.mimeType, data: sceneState.model.base64 } },
+        { inlineData: { mimeType: scene.mimeType, data: scene.base64 } }
+      ];
+      const rawUrl = await callImageModel(parts, aspectRatio);
+
+      const upscaleSetting = document.getElementById('upscaleSelect')?.value || 'match_original';
+      let targetWidth = 1109;
+      if (upscaleSetting === 'match_original') {
+        targetWidth = Math.max(1109, scene.width);
+      } else if (upscaleSetting === '4k') {
+        targetWidth = 2160;
+      } else if (upscaleSetting === 'raw') {
+        targetWidth = 0;
+      }
+      const upscaled = await upscaleAndSharpenImage(rawUrl, targetWidth);
+      const resolutionText = upscaled.width !== upscaled.rawWidth
+        ? `${upscaled.rawWidth}px → ${upscaled.width}px (phóng to)`
+        : `${upscaled.width}px (gốc từ AI)`;
+
+      return {
+        id: 'sres_' + Math.random().toString(36).substr(2, 9),
+        sceneRef: scene,
+        modelUrl: sceneState.model.url,
+        sceneUrl: scene.url,
+        sceneName: scene.name,
+        resultUrl: upscaled.url,
+        width: upscaled.width || scene.width,
+        height: upscaled.height || scene.height,
+        promptUsed: prompt,
+        resolutionText,
+        usedAnalysis: !!scene.analysis,
+        createdAt: new Date().toLocaleTimeString()
+      };
+    }
+
+    const sBtnStart = document.getElementById('sBtnStart');
+    const sSpinner = document.getElementById('sSpinner');
+    const sBtnText = document.getElementById('sBtnText');
+
+    function setSceneBusy(isBusy) {
+      sBtnStart.disabled = isBusy;
+      sSpinner.classList.toggle('hidden', !isBusy);
+      sBtnText.textContent = isBusy ? 'AI đang ghép & render...' : 'Bắt đầu Ghép Mẫu Vào Bối Cảnh';
+    }
+
+    sBtnStart.addEventListener('click', async () => {
+      if (sceneState.isProcessing) return;
+      if (!sceneState.model) {
+        showToast('Vui lòng tải lên ảnh Người Mẫu của bạn trước!', 'warning');
+        return;
+      }
+      if (sceneState.scenes.length === 0) {
+        showToast('Vui lòng thêm ít nhất 1 ảnh bối cảnh tham khảo!', 'warning');
+        return;
+      }
+
+      const variants = parseInt(document.getElementById('sceneVariants').value, 10) || 1;
+      const useAnalysis = document.getElementById('sceneAnalyze').checked;
+      const badge = document.getElementById('statusBadgeText');
+      const total = sceneState.scenes.length * variants;
+      let done = 0;
+
+      sceneState.isProcessing = true;
+      setSceneBusy(true);
+      showToast(`Bắt đầu ghép ${total} ảnh...`, 'info');
+
+      for (const scene of sceneState.scenes) {
+        scene.status = 'pending';
+        renderScenes();
+
+        if (useAnalysis && !scene.analysis) {
+          try {
+            badge.textContent = 'Đang phân tích ánh sáng bối cảnh...';
+            scene.analysis = await analyzeScene(scene);
+          } catch (err) {
+            console.error(err);
+            showToast('Không phân tích được ánh sáng, vẫn ghép bằng quy tắc mặc định.', 'warning');
+          }
+        }
+
+        let okCount = 0;
+        for (let v = 0; v < variants; v++) {
+          try {
+            badge.textContent = `Đang ghép ${done + 1}/${total}...`;
+            const res = await runSceneJob(scene);
+            sceneState.results.unshift(res);
+            renderSceneResults();
+            okCount++;
+            showToast(`Đã ghép xong (${res.resolutionText}): ${scene.name}`, 'success');
+          } catch (err) {
+            console.error(err);
+            showToast(`Lỗi khi ghép "${scene.name}": ${err.message}`, 'error');
+          }
+          done++;
+        }
+        scene.status = okCount > 0 ? 'success' : 'error';
+        renderScenes();
+      }
+
+      sceneState.isProcessing = false;
+      setSceneBusy(false);
+      badge.textContent = 'Hoàn tất tất cả';
+      showToast('Đã hoàn tất toàn bộ hàng đợi ghép bối cảnh!', 'success');
+    });
+
+    const sCards = document.getElementById('sCards');
+    const sEmptyState = document.getElementById('sEmptyState');
+    const sResultCount = document.getElementById('sResultCount');
+    const sBtnDownloadAll = document.getElementById('sBtnDownloadAll');
+
+    function renderSceneResults() {
+      sResultCount.textContent = `${sceneState.results.length} kết quả`;
+
+      if (sceneState.results.length === 0) {
+        sEmptyState.classList.remove('hidden');
+        sCards.classList.add('hidden');
+        sBtnDownloadAll.disabled = true;
+        return;
+      }
+
+      sEmptyState.classList.add('hidden');
+      sCards.classList.remove('hidden');
+      sBtnDownloadAll.disabled = false;
+      sCards.innerHTML = '';
+
+      sceneState.results.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'bg-gray-900 border border-gray-800 rounded-xl overflow-hidden shadow-lg flex flex-col group hover:border-brand-500/50 transition-all';
+        card.innerHTML = `
+          <div class="relative bg-black overflow-hidden cursor-pointer" style="aspect-ratio: ${item.width} / ${item.height};" onclick="openSceneModal('${item.id}')">
+            <img src="${item.resultUrl}" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300" alt="Scene result">
+            <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+              <span class="bg-black/70 backdrop-blur-md text-[10px] font-bold text-white px-2 py-0.5 rounded-full border border-white/10">SCENE SWAP</span>
+              ${item.usedAnalysis ? '<span class="bg-emerald-600/80 backdrop-blur-md text-[10px] font-bold text-white px-2 py-0.5 rounded-full">Đã phân tích sáng</span>' : ''}
+            </div>
+            <div class="absolute bottom-2.5 left-2.5 flex items-center gap-2 bg-gray-900/80 backdrop-blur-md border border-gray-700/60 p-1.5 rounded-lg max-w-[80%]">
+              <img src="${item.sceneUrl}" class="w-7 h-7 rounded object-cover border border-gray-600">
+              <div class="min-w-0 pr-1">
+                <p class="text-[10px] font-semibold text-gray-200 truncate">${item.sceneName}</p>
+                <p class="text-[9px] text-emerald-400 font-bold">${item.resolutionText || ''}</p>
+              </div>
+            </div>
+          </div>
+          <div class="p-3 border-t border-gray-800 flex items-center justify-between text-xs bg-gray-900/90">
+            <span class="text-gray-400 text-[10px]">${item.createdAt}</span>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="regenScene('${item.id}')" class="px-2 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 rounded-md text-[11px] font-semibold" title="Tạo lại với cùng bối cảnh">Tạo lại</button>
+              <button type="button" onclick="copySceneCardPrompt('${item.id}')" class="text-gray-400 hover:text-white p-1" title="Sao chép prompt">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+              </button>
+              <a href="${item.resultUrl}" download="scene-swap-${item.id}.png" class="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 rounded-md text-[11px] font-semibold flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Tải ảnh
+              </a>
+            </div>
+          </div>
+        `;
+        sCards.appendChild(card);
+      });
+    }
+
+    window.regenScene = async function(id) {
+      if (sceneState.isProcessing) {
+        showToast('Đang xử lý, vui lòng chờ xong rồi tạo lại.', 'warning');
+        return;
+      }
+      const item = sceneState.results.find(r => r.id === id);
+      if (!item) return;
+      if (!sceneState.model) {
+        showToast('Vui lòng nạp lại ảnh Người Mẫu trước!', 'warning');
+        return;
+      }
+      sceneState.isProcessing = true;
+      setSceneBusy(true);
+      showToast('Đang tạo lại ảnh này...', 'info');
+      try {
+        const res = await runSceneJob(item.sceneRef);
+        sceneState.results.unshift(res);
+        renderSceneResults();
+        showToast(`Đã tạo lại xong (${res.resolutionText})`, 'success');
+      } catch (err) {
+        console.error(err);
+        showToast('Lỗi khi tạo lại: ' + err.message, 'error');
+      }
+      sceneState.isProcessing = false;
+      setSceneBusy(false);
+    };
+
+    const sPreviewModal = document.getElementById('sPreviewModal');
+    const sModalPrompt = document.getElementById('sModalPrompt');
+    const sModalDownload = document.getElementById('sModalDownload');
+
+    window.openSceneModal = function(id) {
+      const item = sceneState.results.find(r => r.id === id);
+      if (!item) return;
+      document.getElementById('sModalModelImg').src = item.modelUrl;
+      document.getElementById('sModalSceneImg').src = item.sceneUrl;
+      document.getElementById('sModalResultImg').src = item.resultUrl;
+      sModalPrompt.textContent = item.promptUsed;
+      sModalDownload.href = item.resultUrl;
+      sModalDownload.download = `scene-swap-${item.id}.png`;
+      sPreviewModal.classList.remove('hidden');
+    };
+
+    document.getElementById('sBtnClosePreview').addEventListener('click', () => sPreviewModal.classList.add('hidden'));
+
+    document.getElementById('sBtnCopyPrompt').addEventListener('click', () => {
+      const text = sModalPrompt.textContent;
+      navigator.clipboard?.writeText ? navigator.clipboard.writeText(text) : copyFallback(text);
+      showToast('Đã sao chép prompt vào Clipboard!', 'success');
+    });
+
+    window.copySceneCardPrompt = function(id) {
+      const item = sceneState.results.find(r => r.id === id);
+      if (!item) return;
+      navigator.clipboard?.writeText ? navigator.clipboard.writeText(item.promptUsed) : copyFallback(item.promptUsed);
+      showToast('Đã sao chép prompt của ảnh này!', 'success');
+    };
+
+    sBtnDownloadAll.addEventListener('click', () => {
+      if (sceneState.results.length === 0) return;
+      showToast(`Đang chuẩn bị tải xuống ${sceneState.results.length} ảnh...`, 'info');
+      sceneState.results.forEach((item, index) => {
+        setTimeout(() => {
+          const a = document.createElement('a');
+          a.href = item.resultUrl;
+          a.download = `scene-swap-${index + 1}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }, index * 400);
+      });
+    });
+
+    document.getElementById('sBtnClearResults').addEventListener('click', () => {
+      sceneState.results = [];
+      renderSceneResults();
+      showToast('Đã xóa danh sách kết quả', 'info');
+    });
+  </script>
+</body>
+</html>
