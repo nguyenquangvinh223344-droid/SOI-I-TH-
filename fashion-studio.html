@@ -422,6 +422,15 @@
           </div>
 
           <div>
+            <label class="block font-semibold text-gray-300 mb-1.5">Dáng đứng &amp; góc máy:</label>
+            <select id="scenePose" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-gray-200 focus:outline-none focus:border-brand-500">
+              <option value="copy_reference" selected>1. Tạo dáng y theo người mẫu trong ảnh bối cảnh (giữ góc máy gốc)</option>
+              <option value="standing_relaxed">2. Đứng thẳng chính diện, nửa người, 2 tay thả lỏng (kiểu ảnh đứng selfie dọc)</option>
+            </select>
+            <p class="text-[10px] text-gray-500 mt-1">Chế độ 2 vẫn lấy bối cảnh, ánh sáng và bóng đổ từ ảnh bối cảnh, nhưng đổi sang góc máy thẳng, lấy từ đầu đến giữa đùi.</p>
+          </div>
+
+          <div>
             <label class="block font-semibold text-gray-300 mb-1.5">Biểu cảm khuôn mặt:</label>
             <select id="sceneExpression" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-gray-200 focus:outline-none focus:border-brand-500">
               <option value="keep_model" selected>Giữ biểu cảm tự nhiên của mẫu</option>
@@ -1699,6 +1708,7 @@
     function readSceneOptions() {
       return {
         realism: document.getElementById('sceneRealism').value,
+        pose: document.getElementById('scenePose').value,
         expression: document.getElementById('sceneExpression').value,
         removeHeld: document.getElementById('sceneRemoveHeld').checked,
         note: document.getElementById('sceneNote').value.trim()
@@ -1741,8 +1751,11 @@
         ? 'Objects: do not carry over any handheld object from Image 1 (phone, cup, etc.). Her hands are empty and relaxed, unless the pose in Image 2 holds something, which you may then reproduce naturally.'
         : 'Objects: keep a handheld object from Image 1 only if it fits the pose of Image 2.';
 
+      const standing = opts.pose === 'standing_relaxed';
       const lines = [];
-      lines.push('Image 1 is my model, the person to insert. Image 2 is a reference photo of a different person standing in a real location. Create ONE photorealistic photo that has the location, camera, framing, lighting and pose of Image 2, but with the person from Image 1 in it instead of the original person.');
+      lines.push(standing
+        ? 'Image 1 is my model, the person to insert. Image 2 is a reference photo of a different person standing in a real location. Create ONE photorealistic photo set in the same location and lighting as Image 2, with the person from Image 1 standing there in the new frontal pose and camera framing described below.'
+        : 'Image 1 is my model, the person to insert. Image 2 is a reference photo of a different person standing in a real location. Create ONE photorealistic photo that has the location, camera, framing, lighting and pose of Image 2, but with the person from Image 1 in it instead of the original person.');
       lines.push('');
       lines.push('[KEEP EXACTLY FROM IMAGE 1 - THE PERSON]');
       lines.push('- Identity: identical face shape, eyes, eyebrows, nose, lips, skin tone and any beauty marks. The same real person, not a lookalike. Do not beautify, slim or alter any feature.');
@@ -1753,9 +1766,16 @@
       lines.push('- ' + heldLine);
       lines.push('');
       lines.push('[TAKE EXACTLY FROM IMAGE 2 - THE SCENE]');
-      lines.push('- Location and background: keep every object, building, plant, line and sign exactly as it is. Do not redesign or relocate anything.');
-      lines.push('- Camera: same framing, crop, camera height, angle, perspective, horizon line and lens distance. Same aspect ratio.');
-      lines.push('- Pose: copy the pose of the person in Image 2 exactly: body orientation, head tilt, gaze direction, arm and hand positions, leg stance and weight distribution. Same position and scale in the frame.');
+      lines.push(standing
+        ? '- Location and background: the same place with the same objects, buildings, plants, lines and signs, and the same lighting, colours and time of day as Image 2. The camera now looks from a straight frontal viewpoint, so re-render the background naturally in correct perspective for that view, without inventing new elements or changing the mood.'
+        : '- Location and background: keep every object, building, plant, line and sign exactly as it is. Do not redesign or relocate anything.');
+      if (standing) {
+        lines.push('- Camera: vertical portrait photo, like a full-screen phone video frame filmed by a friend. The camera is held straight and level at chest to eye height, facing her exactly frontally, with no tilt and no high or low angle. Medium-long shot: the frame is cropped from just above her head down to the middle of her thighs. She is centered, close to the camera, and fills about 70 to 75 percent of the frame height, with a small gap of space above her head. Natural perspective with no wide-angle stretching, and slightly shallow depth of field behind her.');
+        lines.push('- Pose: she stands straight and relaxed, facing the camera squarely, shoulders square and loose, hips level, head straight and level looking into the lens. Her weight rests on one leg with the other knee slightly relaxed. BOTH arms hang loosely and naturally down along her body with relaxed fingers. A natural, gentle expression. Do NOT copy the pose or camera angle of the person in Image 2.');
+      } else {
+        lines.push('- Camera: same framing, crop, camera height, angle, perspective, horizon line and lens distance. Same aspect ratio.');
+        lines.push('- Pose: copy the pose of the person in Image 2 exactly: body orientation, head tilt, gaze direction, arm and hand positions, leg stance and weight distribution. Same position and scale in the frame.');
+      }
       lines.push('- Remove the original person of Image 2 completely, with nothing of her left behind: no hair, no clothing, no limbs, no shadow of her and no leftover edges.');
       lines.push('');
       lines.push('[LIGHTING AND PHYSICAL INTEGRATION - CRITICAL]');
@@ -1789,7 +1809,9 @@
       }
 
       lines.push('');
-      lines.push('Output a single photo with the same aspect ratio and framing as Image 2. No text, no watermark, no collage, no side-by-side. Exactly one main subject, the person from Image 1. Keep any unrelated people in the background of Image 2 as they are.');
+      lines.push(standing
+        ? 'Output a single vertical photo in the framing described above. No text, no watermark, no collage, no side-by-side. Exactly one main subject, the person from Image 1. Keep any unrelated people in the far background of Image 2 as they are.'
+        : 'Output a single photo with the same aspect ratio and framing as Image 2. No text, no watermark, no collage, no side-by-side. Exactly one main subject, the person from Image 1. Keep any unrelated people in the background of Image 2 as they are.');
       return lines.join('\n');
     }
 
@@ -1854,7 +1876,10 @@
     async function runSceneJob(scene) {
       const opts = readSceneOptions();
       const prompt = buildScenePrompt(opts, scene.analysis);
-      const aspectRatio = nearestAspectRatio(scene.width, scene.height);
+      const sceneRatio = scene.width / scene.height;
+      const aspectRatio = opts.pose === 'standing_relaxed' && sceneRatio > 0.8
+        ? '3:4'
+        : nearestAspectRatio(scene.width, scene.height);
       const parts = [
         { text: prompt },
         { inlineData: { mimeType: sceneState.model.mimeType, data: sceneState.model.base64 } },
