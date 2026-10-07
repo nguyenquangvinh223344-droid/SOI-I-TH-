@@ -429,10 +429,9 @@
   </div>
 
   <script>
-    // State management
     const state = {
-      modelImage: null, // { file, base64, mimeType, url, name, size, width, height }
-      products: [],     // array of { id, file, base64, mimeType, url, name, size, status: 'idle'|'pending'|'success'|'error', resultUrl, promptUsed, styleTag }
+      modelImage: null,
+      products: [],
       isProcessing: false,
       customApiKey: '',
       aspectRatio: 'match_model',
@@ -440,7 +439,6 @@
       results: []
     };
 
-    // Helper: Toast alerts without browser alert()
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
@@ -493,7 +491,6 @@
       return (bytes / 1048576).toFixed(1) + ' MB';
     }
 
-    // Model Upload Handlers
     const modelDropZone = document.getElementById('modelDropZone');
     const modelInput = document.getElementById('modelInput');
     const modelEmptyState = document.getElementById('modelEmptyState');
@@ -543,7 +540,6 @@
       try {
         const { base64, mimeType, dataUrl } = await fileToBase64(file);
 
-        // Measure original dimensions
         const imgObj = new Image();
         imgObj.src = dataUrl;
         await new Promise(r => imgObj.onload = r);
@@ -579,7 +575,6 @@
       showToast('Đã gỡ ảnh người mẫu', 'info');
     }
 
-    // Batch Products Upload Handlers
     const productDropZone = document.getElementById('productDropZone');
     const productInput = document.getElementById('productInput');
     const productsQueueList = document.getElementById('productsQueueList');
@@ -687,9 +682,6 @@
       }).join('');
     }
 
-    // Upscale + unsharp mask. Returns { url, width, height, rawWidth }.
-    // - If the AI output is already >= targetWidth, it is returned untouched (no quality loss).
-    // - Otherwise it is resized on canvas and sharpened with a real unsharp mask (blur radius + threshold).
     async function upscaleAndSharpenImage(dataUrl, targetWidth) {
       return new Promise((resolve) => {
         const img = new Image();
@@ -725,7 +717,6 @@
             const bctx = blurCanvas.getContext('2d', { willReadFrequently: true });
 
             if ('filter' in bctx) {
-              // Real unsharp mask: sharpened = orig + amount * (orig - blurred), ignoring tiny differences (noise)
               bctx.filter = `blur(${radius}px)`;
               bctx.drawImage(canvas, 0, 0);
               const orig = ctx.getImageData(0, 0, w, h);
@@ -734,7 +725,7 @@
               const b = blur.data;
               const amount = 0.7;
               const threshold = 2;
-              const m = Math.ceil(radius * 2); // skip borders where blur bleeds transparency
+              const m = Math.ceil(radius * 2);
               for (let y = m; y < h - m; y++) {
                 for (let x = m; x < w - m; x++) {
                   const i = (y * w + x) * 4;
@@ -749,7 +740,6 @@
               }
               ctx.putImageData(orig, 0, 0);
             } else {
-              // Fallback for browsers without ctx.filter (e.g. Safari): 4-neighbour kernel
               const imgData = ctx.getImageData(0, 0, w, h);
               const data = imgData.data;
               const copy = new Uint8ClampedArray(data);
@@ -786,7 +776,6 @@
       renderProductsQueue();
     };
 
-    // The intelligent prompt generator that creates a unique, non-repeating mix & match for each photo
     const STYLES_POOL = [
       { name: "Urban Streetwear", promptMood: "trendy Seoul streetwear, effortless cool, subtle edge" },
       { name: "Korean Minimal Chic", promptMood: "refined minimalist Korean aesthetic, clean neutral tones, elegant simplicity" },
@@ -858,14 +847,11 @@
         chosenMood = found || STYLES_POOL[0];
       }
 
-      // Collect checked accessories
       const checkedBoxes = Array.from(document.querySelectorAll('.acc-item:checked')).map(cb => cb.value);
 
-      // Determine how many accessories (0 to 2 items for authenticity)
-      const count = Math.floor(Math.random() * 3); // 0, 1, or 2
+      const count = Math.floor(Math.random() * 3);
       const selectedAccs = [];
       if (checkedBoxes.length > 0 && count > 0) {
-        // shuffle
         const shuffledPool = [...checkedBoxes].sort(() => 0.5 - Math.random());
         for (let i = 0; i < Math.min(count, shuffledPool.length); i++) {
           const category = shuffledPool[i];
@@ -879,7 +865,6 @@
         ? `Styling accents: Add ${selectedAccs.join(', ')}. Keep them completely natural, never covering her facial features or eyes.`
         : `Zero extra accessories—clean, minimalist, natural everyday styling.`;
 
-      // Optimized prompt eliminating plastic skin and restoring raw optical sharpness
       const promptText = `Direct photo garment replacement of Image 1 using the product from Image 2.
 
 [CRITICAL: ANCHOR IMAGE 1 AS PIXEL REFERENCE]:
@@ -909,7 +894,6 @@
       };
     }
 
-    // Aspect ratios accepted by Gemini image models
     const SUPPORTED_RATIOS = {
       '1:1': 1, '2:3': 2 / 3, '3:2': 3 / 2, '3:4': 3 / 4, '4:3': 4 / 3,
       '4:5': 4 / 5, '5:4': 5 / 4, '9:16': 9 / 16, '16:9': 16 / 9, '21:9': 21 / 9
@@ -926,7 +910,6 @@
       return best;
     }
 
-    // Read the two settings that were previously ignored and turn them into API imageConfig
     function resolveImageConfig() {
       const ratioSetting = document.getElementById('aspectRatioSelect')?.value || 'match_model';
       const upscaleSetting = document.getElementById('upscaleSelect')?.value || 'match_original';
@@ -955,7 +938,6 @@
         { inlineData: { mimeType: productMime, data: productBase64 } }
       ];
 
-      // Try the richest config first, then degrade if the model rejects the fields
       const wanted = resolveImageConfig();
       const configLevels = [
         { ...(wanted.aspectRatio ? { aspectRatio: wanted.aspectRatio } : {}), imageSize: wanted.imageSize },
@@ -970,7 +952,6 @@
         return { contents: [{ role: "user", parts }], generationConfig };
       }
 
-      // Exponential backoff
       const maxRetries = 3;
       let attempt = 0;
       let delay = 1500;
@@ -1057,7 +1038,6 @@
             prompt
           );
 
-          // Upscale only if the model's output is smaller than the target width
           const upscaleSetting = document.getElementById('upscaleSelect')?.value || 'match_original';
           let targetWidth = 1109;
           if (upscaleSetting === 'match_original' && state.modelImage?.width) {
@@ -1077,7 +1057,6 @@
           product.status = 'success';
           product.resultUrl = generatedImageUrl;
 
-          // Push to state results
           state.results.unshift({
             id: 'res_' + Math.random().toString(36).substr(2, 9),
             modelUrl: state.modelImage.url,
@@ -1141,7 +1120,6 @@
         card.className = 'bg-gray-900 border border-gray-800 rounded-xl overflow-hidden shadow-lg flex flex-col group hover:border-brand-500/50 transition-all';
 
         card.innerHTML = `
-          <!-- Image Showcase -->
           <div class="relative aspect-[3/4] bg-black overflow-hidden cursor-pointer" onclick="openPreviewModal('${item.id}')">
             <img src="${item.resultUrl}" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300" alt="Generated Fashion Look">
 
@@ -1150,7 +1128,6 @@
               <span class="bg-brand-600/80 backdrop-blur-md text-[10px] font-bold text-white px-2 py-0.5 rounded-full">${item.styleTag}</span>
             </div>
 
-            <!-- Inset Product Thumbnail -->
             <div class="absolute bottom-2.5 left-2.5 flex items-center gap-2 bg-gray-900/80 backdrop-blur-md border border-gray-700/60 p-1.5 rounded-lg max-w-[80%]">
               <img src="${item.productUrl}" class="w-7 h-7 rounded object-cover border border-gray-600">
               <div class="min-w-0 pr-1">
@@ -1159,7 +1136,6 @@
               </div>
             </div>
 
-            <!-- Hover overlay -->
             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
               <span class="bg-brand-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-1">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
@@ -1168,7 +1144,6 @@
             </div>
           </div>
 
-          <!-- Card Footer -->
           <div class="p-3 border-t border-gray-800 flex items-center justify-between text-xs bg-gray-900/90">
             <span class="text-gray-400 text-[10px]">${item.createdAt}</span>
             <div class="flex items-center gap-2">
@@ -1187,7 +1162,6 @@
       });
     }
 
-    // Modal Preview & Side-by-side Inspection
     const previewModal = document.getElementById('previewModal');
     const btnClosePreviewModal = document.getElementById('btnClosePreviewModal');
     const modalModelImg = document.getElementById('modalModelImg');
@@ -1237,7 +1211,6 @@
       document.body.removeChild(ta);
     }
 
-    // Download All
     btnDownloadAll.addEventListener('click', () => {
       if (state.results.length === 0) return;
       showToast(`Đang chuẩn bị tải xuống ${state.results.length} ảnh...`, 'info');
@@ -1253,14 +1226,12 @@
       });
     });
 
-    // Clear Results
     document.getElementById('btnClearResults').addEventListener('click', () => {
       state.results = [];
       renderResultsGrid();
       showToast('Đã xóa danh sách kết quả', 'info');
     });
 
-    // Settings Modal Handlers
     const btnSettingsModal = document.getElementById('btnSettingsModal');
     const settingsModal = document.getElementById('settingsModal');
     const btnCloseSettingsModal = document.getElementById('btnCloseSettingsModal');
