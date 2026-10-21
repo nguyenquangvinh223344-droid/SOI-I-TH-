@@ -1,0 +1,584 @@
+{
+ "selects": [
+  {
+   "id": "styleMoodSelect",
+   "label": "Gu thẩm mỹ ưu tiên (AI Stylist Mood):",
+   "value": "ai",
+   "options": [
+    {
+     "v": "ai",
+     "t": "🤖 AI tự quyết theo sản phẩm (khuyên dùng)"
+    },
+    {
+     "v": "auto",
+     "t": "🎲 Random Vòng Quay (Mỗi ảnh 1 gu khác nhau: Streetwear, Vintage, Cozy, Sweet...)"
+    },
+    {
+     "v": "streetwear",
+     "t": "🛹 Năng động & Phố phường (Streetwear, Y2K cá tính)"
+    },
+    {
+     "v": "korean_minimal",
+     "t": "✨ Tối giản Hàn Quốc (Minimal chic, thanh lịch, tone màu tinh tế)"
+    },
+    {
+     "v": "cozy_autumn",
+     "t": "🍂 Ấm áp Mùa Thu/Đông (Cozy, layer, khăn len mỏng)"
+    },
+    {
+     "v": "sporty",
+     "t": "⚡ Năng động Thể Thao (Sporty casual)"
+    },
+    {
+     "v": "vintage",
+     "t": "📼 Cổ điển Hoài niệm (Retro, vintage aesthetic)"
+    },
+    {
+     "v": "sweet",
+     "t": "🌸 Nhẹ nhàng Cuối tuần (Sweet casual, trẻ trung)"
+    },
+    {
+     "v": "y2k",
+     "t": "💿 Y2K (cạp trễ, crop, bạc, hồng baby)"
+    },
+    {
+     "v": "gorpcore",
+     "t": "🏔️ Gorpcore (đồ dã ngoại, dù, olive, xám than)"
+    },
+    {
+     "v": "blokecore",
+     "t": "⚽ Blokecore (áo bóng đá, retro thể thao)"
+    },
+    {
+     "v": "coquette",
+     "t": "🎀 Coquette (nơ, ren, kem hồng, tiểu thư)"
+    },
+    {
+     "v": "vina_boy",
+     "t": "🌃 Boy Phố (đen trắng bạc, ôm gọn, đồ họa, khoá kim loại)"
+    },
+    {
+     "v": "vina_girl",
+     "t": "🖤 Girl Phố (ôm, cạp cao, đen đỏ đô, đế dày, ánh bạc)"
+    },
+    {
+     "v": "old_money",
+     "t": "🎩 Old Money (preppy, navy, kem, xanh rêu)"
+    }
+   ]
+  },
+  {
+   "id": "plannerMode",
+   "label": "Cách phối đồ:",
+   "value": "ai",
+   "options": [
+    {
+     "v": "dice",
+     "t": "⚡ Bốc món nhanh (như cũ, ổn định)"
+    },
+    {
+     "v": "ai",
+     "t": "🧠 Stylist AI (lai): code giữ luật, AI tự nghĩ món cụ thể"
+    }
+   ]
+  },
+  {
+   "id": "seasonSelect",
+   "label": "Mùa của bộ đồ:",
+   "value": "auto",
+   "options": [
+    {
+     "v": "auto",
+     "t": "🤖 Tự động (AI nhìn sản phẩm)"
+    },
+    {
+     "v": "summer",
+     "t": "☀️ Mùa Hè"
+    },
+    {
+     "v": "autumn",
+     "t": "🍁 Mùa Thu"
+    },
+    {
+     "v": "winter",
+     "t": "❄️ Mùa Đông"
+    },
+    {
+     "v": "spring",
+     "t": "🌷 Mùa Xuân"
+    }
+   ]
+  },
+  {
+   "id": "genderSelect",
+   "label": "Giới tính người mẫu:",
+   "value": "auto",
+   "options": [
+    {
+     "v": "auto",
+     "t": "🤖 Tự nhận từ ảnh mẫu"
+    },
+    {
+     "v": "f",
+     "t": "Nữ"
+    },
+    {
+     "v": "m",
+     "t": "Nam"
+    }
+   ]
+  },
+  {
+   "id": "accCountMode",
+   "label": "Số phụ kiện mỗi ảnh:",
+   "value": "auto",
+   "options": [
+    {
+     "v": "auto",
+     "t": "🤖 Tự động theo gu (khuyên dùng)"
+    },
+    {
+     "v": "0-1",
+     "t": "0 đến 1 món (tối giản)"
+    },
+    {
+     "v": "1-2",
+     "t": "1 đến 2 món"
+    },
+    {
+     "v": "2-3",
+     "t": "2 đến 3 món"
+    },
+    {
+     "v": "3-4",
+     "t": "3 đến 4 món (nhiều)"
+    }
+   ]
+  },
+  {
+   "id": "jewelCountMode",
+   "label": "Số trang sức mỗi ảnh:",
+   "value": "auto",
+   "options": [
+    {
+     "v": "auto",
+     "t": "🤖 Tự động theo gu (khuyên dùng)"
+    },
+    {
+     "v": "0",
+     "t": "Không đeo"
+    },
+    {
+     "v": "0-1",
+     "t": "0 đến 1 món"
+    },
+    {
+     "v": "1-2",
+     "t": "1 đến 2 món"
+    },
+    {
+     "v": "2-3",
+     "t": "2 đến 3 món (nhiều)"
+    }
+   ]
+  },
+  {
+   "id": "decorMode",
+   "label": "Tỉ lệ có logo / họa tiết hư cấu: 100% (0% = tắt)",
+   "value": "auto",
+   "options": [
+    {
+     "v": "auto",
+     "t": "🤖 Pha trộn logo + nghệ thuật theo gu (khuyên dùng)"
+    },
+    {
+     "v": "logo",
+     "t": "Chỉ logo nhỏ"
+    },
+    {
+     "v": "art",
+     "t": "Chỉ tranh nghệ thuật (màu nước, khắc gỗ, trừu tượng...)"
+    },
+    {
+     "v": "both",
+     "t": "Luôn kết hợp cả hai"
+    },
+    {
+     "v": "full",
+     "t": "Thiết kế TOÀN BỘ một món theo tranh (mũ, túi, giày, áo khoác)"
+    }
+   ]
+  },
+  {
+   "id": "maxRetries",
+   "label": "Tự sửa tối đa",
+   "value": "0",
+   "options": [
+    {
+     "v": "0",
+     "t": "0"
+    },
+    {
+     "v": "1",
+     "t": "1"
+    },
+    {
+     "v": "2",
+     "t": "2"
+    }
+   ]
+  },
+  {
+   "id": "outfitThreads",
+   "label": "Số luồng",
+   "value": "3",
+   "options": [
+    {
+     "v": "1",
+     "t": "1"
+    },
+    {
+     "v": "2",
+     "t": "2"
+    },
+    {
+     "v": "3",
+     "t": "3"
+    },
+    {
+     "v": "4",
+     "t": "4"
+    },
+    {
+     "v": "5",
+     "t": "5"
+    }
+   ]
+  },
+  {
+   "id": "p2MoodL",
+   "label": "Gu người bên TRÁI ảnh:",
+   "value": "auto",
+   "options": [
+    {
+     "v": "auto",
+     "t": "🎲 Tự ghép cặp tương phản (khuyên dùng)"
+    },
+    {
+     "v": "streetwear",
+     "t": "🛹 Năng động & Phố phường (Streetwear, Y2K cá tính)"
+    },
+    {
+     "v": "korean_minimal",
+     "t": "✨ Tối giản Hàn Quốc (Minimal chic, thanh lịch, tone màu tinh tế)"
+    },
+    {
+     "v": "cozy_autumn",
+     "t": "🍂 Ấm áp Mùa Thu/Đông (Cozy, layer, khăn len mỏng)"
+    },
+    {
+     "v": "sporty",
+     "t": "⚡ Năng động Thể Thao (Sporty casual)"
+    },
+    {
+     "v": "vintage",
+     "t": "📼 Cổ điển Hoài niệm (Retro, vintage aesthetic)"
+    },
+    {
+     "v": "sweet",
+     "t": "🌸 Nhẹ nhàng Cuối tuần (Sweet casual, trẻ trung)"
+    },
+    {
+     "v": "y2k",
+     "t": "💿 Y2K (cạp trễ, crop, bạc, hồng baby)"
+    },
+    {
+     "v": "gorpcore",
+     "t": "🏔️ Gorpcore (đồ dã ngoại, dù, olive, xám than)"
+    },
+    {
+     "v": "blokecore",
+     "t": "⚽ Blokecore (áo bóng đá, retro thể thao)"
+    },
+    {
+     "v": "coquette",
+     "t": "🎀 Coquette (nơ, ren, kem hồng, tiểu thư)"
+    },
+    {
+     "v": "vina_boy",
+     "t": "🌃 Boy Phố (đen trắng bạc, ôm gọn, đồ họa, khoá kim loại)"
+    },
+    {
+     "v": "vina_girl",
+     "t": "🖤 Girl Phố (ôm, cạp cao, đen đỏ đô, đế dày, ánh bạc)"
+    },
+    {
+     "v": "old_money",
+     "t": "🎩 Old Money (preppy, navy, kem, xanh rêu)"
+    }
+   ]
+  },
+  {
+   "id": "p2MoodR",
+   "label": "Gu người bên PHẢI ảnh:",
+   "value": "auto",
+   "options": [
+    {
+     "v": "auto",
+     "t": "🎲 Tự ghép cặp tương phản (khuyên dùng)"
+    },
+    {
+     "v": "streetwear",
+     "t": "🛹 Năng động & Phố phường (Streetwear, Y2K cá tính)"
+    },
+    {
+     "v": "korean_minimal",
+     "t": "✨ Tối giản Hàn Quốc (Minimal chic, thanh lịch, tone màu tinh tế)"
+    },
+    {
+     "v": "cozy_autumn",
+     "t": "🍂 Ấm áp Mùa Thu/Đông (Cozy, layer, khăn len mỏng)"
+    },
+    {
+     "v": "sporty",
+     "t": "⚡ Năng động Thể Thao (Sporty casual)"
+    },
+    {
+     "v": "vintage",
+     "t": "📼 Cổ điển Hoài niệm (Retro, vintage aesthetic)"
+    },
+    {
+     "v": "sweet",
+     "t": "🌸 Nhẹ nhàng Cuối tuần (Sweet casual, trẻ trung)"
+    },
+    {
+     "v": "y2k",
+     "t": "💿 Y2K (cạp trễ, crop, bạc, hồng baby)"
+    },
+    {
+     "v": "gorpcore",
+     "t": "🏔️ Gorpcore (đồ dã ngoại, dù, olive, xám than)"
+    },
+    {
+     "v": "blokecore",
+     "t": "⚽ Blokecore (áo bóng đá, retro thể thao)"
+    },
+    {
+     "v": "coquette",
+     "t": "🎀 Coquette (nơ, ren, kem hồng, tiểu thư)"
+    },
+    {
+     "v": "vina_boy",
+     "t": "🌃 Boy Phố (đen trắng bạc, ôm gọn, đồ họa, khoá kim loại)"
+    },
+    {
+     "v": "vina_girl",
+     "t": "🖤 Girl Phố (ôm, cạp cao, đen đỏ đô, đế dày, ánh bạc)"
+    },
+    {
+     "v": "old_money",
+     "t": "🎩 Old Money (preppy, navy, kem, xanh rêu)"
+    }
+   ]
+  }
+ ],
+ "checks": [
+  {
+   "id": "allowSpecial",
+   "label": "🔓 Mở khóa nhóm đặc biệt",
+   "value": false
+  },
+  {
+   "id": "autoCropProduct",
+   "label": "✂️ Tự cắt sản phẩm",
+   "value": true
+  },
+  {
+   "id": "autoCritic",
+   "label": "🔍 AI tự chấm lại",
+   "value": true
+  },
+  {
+   "id": "useTechniques",
+   "label": "🪄 Biến tấu cách mặc (nhét, xắn, gập, mở)",
+   "value": true
+  }
+ ],
+ "chips": [
+  {
+   "v": "caps_beanies",
+   "label": "🧢 Mũ",
+   "on": true,
+   "grp": "Đầu"
+  },
+  {
+   "v": "hair_clips",
+   "label": "🎀 Kẹp tóc",
+   "on": true,
+   "grp": "Đầu"
+  },
+  {
+   "v": "glasses",
+   "label": "🕶️ Kính",
+   "on": true,
+   "grp": "Đầu"
+  },
+  {
+   "v": "headphones",
+   "label": "🎧 Tai nghe",
+   "on": true,
+   "grp": "Đầu"
+  },
+  {
+   "v": "bandana",
+   "label": "🧕 Bandana",
+   "on": true,
+   "grp": "Đầu"
+  },
+  {
+   "v": "bags_backpack",
+   "label": "👜 Túi",
+   "on": false,
+   "grp": "Thân"
+  },
+  {
+   "v": "backpacks",
+   "label": "🎒 Ba lô",
+   "on": true,
+   "grp": "Thân"
+  },
+  {
+   "v": "scarves",
+   "label": "🧣 Khăn, găng, ô",
+   "on": false,
+   "grp": "Thân"
+  },
+  {
+   "v": "outerwear",
+   "label": "🧥 Áo khoác ngoài",
+   "on": false,
+   "grp": "Thân"
+  },
+  {
+   "v": "belts",
+   "label": "🪢 Thắt lưng",
+   "on": true,
+   "grp": "Thân"
+  },
+  {
+   "v": "neckwear",
+   "label": "🎗️ Nơ, cà vạt",
+   "on": false,
+   "grp": "Thân"
+  },
+  {
+   "v": "bag_charm",
+   "label": "🧸 Charm treo túi",
+   "on": true,
+   "grp": "Thân"
+  },
+  {
+   "v": "shoulder_sweater",
+   "label": "🧶 Áo len vắt vai",
+   "on": true,
+   "grp": "Thân"
+  },
+  {
+   "v": "shoes",
+   "label": "👟 Giày dép",
+   "on": false,
+   "grp": "Chân"
+  },
+  {
+   "v": "socks",
+   "label": "🧦 Tất, quần tất",
+   "on": false,
+   "grp": "Chân"
+  },
+  {
+   "v": "jewelry",
+   "label": "💍 Dây chuyền, vòng, khuyên",
+   "on": true,
+   "grp": "Trang sức"
+  },
+  {
+   "v": "watch",
+   "label": "⌚ Đồng hồ",
+   "on": true,
+   "grp": "Trang sức"
+  }
+ ],
+ "groups": [
+  {
+   "v": "chubby",
+   "label": "Thú mập tròn viral (capybara...)",
+   "on": true
+  },
+  {
+   "v": "arttoy",
+   "label": "Art toy, blind box",
+   "on": true
+  },
+  {
+   "v": "food",
+   "label": "Đồ ăn, trái cây",
+   "on": true
+  },
+  {
+   "v": "botanical",
+   "label": "Hoa lá",
+   "on": true
+  },
+  {
+   "v": "sky",
+   "label": "Bầu trời, thiên nhiên",
+   "on": true
+  },
+  {
+   "v": "wildlife",
+   "label": "Thú rừng, sinh vật biển",
+   "on": true
+  },
+  {
+   "v": "mythical",
+   "label": "Sinh vật thần thoại",
+   "on": true
+  },
+  {
+   "v": "geometric",
+   "label": "Hình khối trừu tượng",
+   "on": true
+  },
+  {
+   "v": "everyday",
+   "label": "Đồ vật hằng ngày",
+   "on": true
+  },
+  {
+   "v": "chrome",
+   "label": "Cyber chrome gai",
+   "on": true
+  },
+  {
+   "v": "varsity",
+   "label": "Số, huy hiệu thể thao",
+   "on": true
+  },
+  {
+   "v": "bowheart",
+   "label": "Nơ và tim",
+   "on": true
+  },
+  {
+   "v": "smiley",
+   "label": "Emoji, melted smiley",
+   "on": true
+  }
+ ],
+ "logo": {
+  "min": "0",
+  "max": "100",
+  "value": "100",
+  "step": "5"
+ }
+}

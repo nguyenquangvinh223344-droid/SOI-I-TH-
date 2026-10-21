@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Xem thử bộ icon</title>
+<style>
+  :root { --bg:#f6f4fa; --card:#ffffff; --line:#e6e1f0; --txt:#2d2a3a; --dim:#756f8c; --acc:#7c6bb3; }
+  body.dark { --bg:#1e2220; --card:#272c2a; --line:#3a413e; --txt:#e9ece8; --dim:#9aa39d; --acc:#7fb69a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt); font:14px/1.45 system-ui,"Segoe UI",sans-serif; transition:background .2s,color .2s; }
+  .top { position:sticky; top:0; background:#222; color:#fff; padding:8px 12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; z-index:5; }
+  .top button { border:0; border-radius:8px; padding:7px 12px; font:inherit; cursor:pointer; background:#444; color:#fff; } .top button.on { background:#fff; color:#111; font-weight:700; }
+  main { max-width:980px; margin:0 auto; padding:16px; }
+  h2 { font-size:13px; text-transform:uppercase; letter-spacing:.05em; color:var(--dim); margin:22px 0 10px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); gap:10px; }
+  .it { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 6px 8px; text-align:center; color:var(--acc); }
+  .it svg { display:block; margin:0 auto 6px; } .it small { display:block; color:var(--dim); font-size:11px; word-break:break-all; }
+  .sizes { display:flex; gap:14px; justify-content:center; align-items:flex-end; margin-bottom:6px; }
+  .row { display:flex; gap:14px; flex-wrap:wrap; }
+  .chip { display:inline-flex; align-items:center; gap:6px; background:var(--card); border:1px solid var(--line); border-radius:99px; padding:5px 12px 5px 8px; font-size:13px; }
+  .nav { display:flex; background:var(--card); border:1px solid var(--line); border-radius:16px; max-width:390px; } .nav span { flex:1; text-align:center; padding:10px 2px 8px; font-size:11px; color:var(--dim); } .nav span svg { display:block; margin:0 auto 3px; } .nav span.on { color:var(--acc); font-weight:700; }
+  .btns { display:flex; gap:8px; flex-wrap:wrap; } .btn { width:50px; height:44px; border-radius:12px; border:1px solid var(--line); background:var(--card); color:var(--txt); display:inline-flex; align-items:center; justify-content:center; } .btn.cta { background:var(--acc); border-color:var(--acc); color:#fff; }
+</style></head>
+<body>
+<div class="top"><b>Bộ icon do Gemini thiết kế</b><button id="b1" class="on">Sáng</button><button id="b2">Tối</button></div>
+<main id="m"></main>
+<script src="bo_icon_gemini.js"></script>
+<script>
+  const S = (k, s) => '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">' + GEMINI_ICONS[k] + '</svg>';
+  const dark = () => document.body.classList.contains('dark');
+  function draw() {
+    const D = dark() ? 'dark' : 'light', col = (k) => STATUS_COLORS[k][D];
+    const names = Object.keys(GEMINI_ICONS).filter((k) => !k.startsWith('status-'));
+    document.getElementById('m').innerHTML =
+      '<h2>Tất cả icon (' + names.length + ') · hiện cỡ 28px</h2><div class="grid">' + names.map((k) => '<div class="it">' + S(k, 28) + '<small>' + k + '</small></div>').join('') + '</div>' +
+      '<h2>Cùng một icon ở 3 cỡ (kiểm tra có bết nét khi nhỏ không)</h2><div class="it" style="color:var(--txt)"><div class="sizes">' + ['shirt', 'film', 'check-circle', 'sliders', 'trash'].map((k) => '<span>' + S(k, 16) + ' ' + S(k, 20) + ' ' + S(k, 32) + '</span>').join('') + '</div><small>16px · 20px · 32px</small></div>' +
+      '<h2>4 chấm trạng thái thay cho 🟢 ⚪ 🟠 🔴</h2><div class="row">' + [['online', 'Canvas đã nối'], ['offline', 'Chưa nối Canvas'], ['pending', 'Đang chờ app nhận'], ['error', 'Lỗi']].map(([k, t]) => '<span class="chip"><span style="color:' + col(k) + ';display:inline-flex">' + S('status-' + k, 20) + '</span>' + t + '</span>').join('') + '</div>' +
+      '<h2>Thanh dưới (điện thoại)</h2><div class="nav"><span class="on">' + S('grid', 24) + 'Kho ảnh</span><span>' + S('shirt', 24) + 'Phối đồ</span><span>' + S('check-circle', 24) + 'Duyệt</span><span>' + S('video', 24) + 'Video</span><span>' + S('send', 24) + 'Kết quả</span></div>' +
+      '<h2>Hàng nút icon ở tab Kho</h2><div class="btns"><span class="btn cta">' + S('link', 22) + '</span><span class="btn">' + S('folder-plus', 22) + '</span><span class="btn">' + S('film', 22) + '</span><span class="btn">' + S('upload', 22) + '</span><span class="btn">' + S('check-square', 22) + '</span><span class="btn">' + S(dark() ? 'sun' : 'moon', 22) + '</span></div>';
+  }
+  const set = (d) => { document.body.classList.toggle('dark', d); document.getElementById('b1').className = d ? '' : 'on'; document.getElementById('b2').className = d ? 'on' : ''; draw(); };
+  document.getElementById('b1').onclick = () => set(false); document.getElementById('b2').onclick = () => set(true);
+  draw();
+</script>
+</body></html>
