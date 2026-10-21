@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>Quangg Ving Scanner Pro - Theo dõi sản phẩm</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="products.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>📦 Theo dõi <span class="accent-orange">sản phẩm</span></h1>
+    <div class="topbar-right">
+      <div class="updated-at" id="lastRun">Chưa cập nhật lần nào</div>
+      <button id="btnBackDash" class="btn btn-ghost btn-sm">← Về Dashboard clip</button>
+      <button id="btnThemeToggle" class="theme-toggle" title="Đổi sáng/tối">🌙</button>
+    </div>
+  </header>
+  <div class="subtitle">Mỗi lần bấm "Cập nhật số liệu", tool đọc lại lượt bán, số creator, số video… của từng mã từ TikToday và lưu thêm 1 điểm. Biểu đồ 14 và 30 ngày dài ra dần theo số ngày tool đã đo.</div>
+
+  <section class="filters">
+    <div class="filter-field">
+      <label>BIỂU ĐỒ</label>
+      <select id="rangeSel">
+        <option value="7">7 ngày</option>
+        <option value="14">14 ngày</option>
+        <option value="30">30 ngày</option>
+      </select>
+    </div>
+    <div class="filter-field">
+      <label>KẾT LUẬN</label>
+      <select id="verdictSel">
+        <option value="">Tất cả</option>
+        <option value="go">✅ Vào ngay</option>
+        <option value="wait">🟡 Chờ / kiểm tay</option>
+        <option value="drop">❌ Bỏ</option>
+      </select>
+    </div>
+    <div class="filter-field">
+      <label>THÊM SẢN PHẨM (dán link hoặc mã)</label>
+      <input id="addInput" type="text" placeholder="tiktok.com/shop/vn/pdp/… hoặc tiktoday.vn/dashboard/products/…" />
+    </div>
+    <button id="btnAdd" class="btn btn-ghost">Thêm</button>
+    <button id="btnTrack" class="btn btn-orange">🔄 Cập nhật số liệu</button>
+  </section>
+
+  <div class="note-card" id="trackText">Chưa chạy. Thêm sản phẩm bằng nút ⭐ ở cột GIỎ HÀNG của Dashboard, dán link ở trên, hoặc dùng nút "Thêm sản phẩm đang hiện vào theo dõi" trong popup khi đang mở bảng xếp hạng Sản phẩm của TikToday.</div>
+
+  <section class="table-wrap">
+    <table id="prodTable">
+      <thead>
+        <tr>
+          <th>SẢN PHẨM</th>
+          <th>GIÁ</th>
+          <th>ĐÃ BÁN</th>
+          <th>ĐƠN/NGÀY</th>
+          <th>BIỂU ĐỒ</th>
+          <th>CREATOR</th>
+          <th>VIDEO</th>
+          <th>HOA HỒNG</th>
+          <th>SAO</th>
+          <th>KẾT LUẬN</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="prodBody"></tbody>
+    </table>
+    <div id="prodEmpty" class="empty-state" style="display:none;">Danh sách theo dõi đang trống.</div>
+  </section>
+
+  <div class="note-card">
+    <b>Cách chấm:</b> số nào TikToday không có (hiện 0 hoặc bị che) thì ghi "chưa rõ", không tính là trượt.
+    <b>Bỏ</b> khi: giá ngoài 30K–500K, hoa hồng dưới 8%, sao dưới 4.5 (khi đã có từ 50 đánh giá), đã bán trên 100.000, trên 500 creator, hoặc đơn đang giảm.
+    <b>Vào ngay</b> khi: đơn không giảm và đủ mạnh, còn ít creator (≤150) và video chưa tăng nhanh, hoa hồng và sao đều đạt. Hoa hồng/sao chưa rõ thì ở mức "chờ".
+    Cột "view mỗi đơn" chưa tự tính được, sếp xem tay các video top của mã đó.
+    Các con số ngưỡng là ước lượng, chỉnh ở đầu file products.js.
+  </div>
+
+  <script src="products.js"></script>
+</body>
+</html>

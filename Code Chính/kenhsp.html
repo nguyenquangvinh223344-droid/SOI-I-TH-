@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Soi sản phẩm các kênh - Quangg Ving Scanner Pro</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="kenhsp.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Soi <span class="accent-orange">sản phẩm</span> các kênh</h1>
+    <div class="topbar-right">
+      <button id="btnThemeToggle" class="theme-toggle" title="Đổi sáng/tối">🌙</button>
+    </div>
+  </header>
+
+  <main class="ks-wrap">
+    <p class="ks-note">Dán tên kênh (mỗi dòng một kênh, hoặc link TikTok). Tool vào TikToday lật <b>hết các trang</b> của mục <b>Sản phẩm</b> và <b>Cửa hàng đã hợp tác</b> của từng kênh, rồi xuất Excel: sản phẩm, sản phẩm trùng giữa các kênh, cửa hàng trùng, ma trận trùng. Dán thêm kênh mới thì dữ liệu cộng dồn, không mất kênh cũ. Cần đăng nhập sẵn TikToday trên Chrome.</p>
+
+    <section class="ks-card">
+      <label class="ks-label" for="ksList">Danh sách kênh <span id="ksCount" class="ks-chip">0 kênh</span></label>
+      <textarea id="ksList" placeholder="thch.ht.do55&#10;th.iuu6&#10;https://www.tiktok.com/@reviewdoxinh242"></textarea>
+      <div class="ks-btns">
+        <button id="ksStart" class="btn btn-orange">Bắt đầu quét</button>
+        <button id="ksStop" class="btn btn-darkred" disabled>Dừng</button>
+        <button id="ksExport" class="btn btn-ghost">⬇ Xuất Excel</button>
+        <button id="ksClear" class="btn btn-ghost">Xóa dữ liệu đã quét</button>
+      </div>
+      <div class="ks-prog"><div id="ksBar" class="ks-bar"></div></div>
+      <div id="ksStatus" class="ks-status">Sẵn sàng.</div>
+    </section>
+
+    <section class="ks-card">
+      <div class="ks-label">Kênh đã quét</div>
+      <div class="ks-tablewrap">
+        <table class="ks-table">
+          <thead><tr><th>Kênh</th><th>Tên</th><th>Sản phẩm</th><th>Cửa hàng</th><th>Quét lúc</th><th></th></tr></thead>
+          <tbody id="ksRows"></tbody>
+        </table>
+      </div>
+      <div id="ksEmpty" class="ks-empty">Chưa có dữ liệu. Dán tên kênh rồi bấm "Bắt đầu quét".</div>
+    </section>
+
+    <section class="ks-card">
+      <div class="ks-label">Nhật ký</div>
+      <pre id="ksLog" class="ks-log">—</pre>
+      <div id="ksFields" class="ks-fields"></div>
+    </section>
+
+    <section class="ks-card">
+      <div class="ks-label">Soi cửa hàng <span id="siCount" class="ks-chip">0 shop đã quét</span></div>
+      <p class="ks-note">Dán <b>tên kênh</b> (kênh đã quét ở mục trên, tool lấy luôn các shop kênh đó hợp tác), hoặc <b>mã cửa hàng</b>, hoặc <b>link</b> <code>tiktoday.vn/dashboard/shops/&lt;mã&gt;</code>. Mỗi dòng một mục, trộn thoải mái. Mỗi shop tool mở thẳng trang chi tiết trên TikToday và đọc lượt bán, đơn giá, số sản phẩm, đánh giá, hoa hồng, KOC và video 30 ngày... Không lấy số điện thoại hay email của shop.</p>
+      <textarea id="siList" placeholder="thch.ht.do55&#10;ni.nguyn254&#10;7494676283926874798"></textarea>
+      <div class="ks-btns">
+        <button id="siFill" class="btn btn-ghost">Điền sẵn: kênh 1 tỷ + kênh phụ</button>
+        <button id="siStart" class="btn btn-orange">Quét cửa hàng</button>
+        <button id="siStop" class="btn btn-darkred" disabled>Dừng</button>
+        <button id="siExport" class="btn btn-ghost">⬇ Xuất Excel cửa hàng</button>
+        <button id="siClear" class="btn btn-ghost">Xóa dữ liệu cửa hàng</button>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="checkbox" id="siForce" /> Quét lại cả shop đã có</label>
+      </div>
+      <div id="siInfo" class="ks-fields" style="white-space:pre-wrap;margin:0 0 8px;"></div>
+      <div class="ks-prog"><div id="siBar" class="ks-bar"></div></div>
+      <div id="siStatus" class="ks-status">Sẵn sàng.</div>
+      <pre id="siLog" class="ks-log">—</pre>
+    </section>
+
+    <section class="ks-card">
+      <div class="ks-label">Kalodata <span id="kaCount" class="ks-chip">0 kênh đã đọc</span></div>
+      <p class="ks-note">Dùng trong <b>Chrome có tài khoản Kalodata</b>. Mở trang chi tiết nhà sáng tạo trên Kalodata (link dạng <code>kalodata.com/creator/detail?id=...</code>), bấm <b>"Đọc 3 khoảng ngày"</b> ở khung nhỏ góc phải dưới trang. Với từng khoảng <b>Hôm qua, 7 ngày, 30 ngày</b>: đọc <b>hết các trang</b> của bảng Video &amp; Quảng cáo (có nhãn AD), rồi <b>hết các trang</b> của bảng Sản phẩm. Chỉ đọc trang đang mở, không mở link khác nên không tốn thêm lượt xem; cột bị che ghi ****.</p>
+      <div class="ks-btns">
+        <button id="kaExport" class="btn btn-orange">⬇ Xuất Excel Kalodata</button>
+        <button id="kaClear" class="btn btn-ghost">Xóa dữ liệu Kalodata</button>
+      </div>
+      <div class="ks-tablewrap">
+        <table class="ks-table">
+          <thead><tr><th>Kênh</th><th>Hôm qua</th><th>7 ngày</th><th>30 ngày</th><th>Đọc lúc</th><th></th></tr></thead>
+          <tbody id="kaRows"></tbody>
+        </table>
+      </div>
+      <div id="kaEmpty" class="ks-empty">Chưa có dữ liệu Kalodata.</div>
+      <div id="kaStatus" class="ks-status"></div>
+      <div class="ks-label" style="margin-top:14px">Mã QR quét nhanh bằng điện thoại</div>
+      <div class="ks-btns">
+        <select id="qrChan"></select>
+        <select id="qrRange"><option value="Hôm qua">Hôm qua</option><option value="7 ngày trước">7 ngày</option><option value="30 ngày trước">30 ngày</option></select>
+        <select id="qrMonth" title="Lọc theo THÁNG ĐĂNG của video"><option value="">Tất cả tháng</option></select>
+        <select id="qrKind"><option value="video">Video (mở thẳng video TikTok)</option><option value="product">Sản phẩm (mở thẳng TikTok Shop)</option></select>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="checkbox" id="qrAd" /> Chỉ video có AD</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;">Số dòng <input id="qrN" type="number" min="1" max="200" value="24" style="width:60px" /></label>
+        <button id="qrShow" class="btn btn-orange">Hiện mã QR</button>
+      </div>
+      <div id="qrInfo" class="ks-status"></div>
+      <div id="qrGrid" class="qr-grid"></div>
+    </section>
+  </main>
+
+  <script src="libs/xlsx.full.min.js"></script>
+  <script src="kenhsp.js"></script>
+  <script src="kenhsp2.js"></script>
+  <script src="kenhsp3.js"></script>
+</body>
+</html>
