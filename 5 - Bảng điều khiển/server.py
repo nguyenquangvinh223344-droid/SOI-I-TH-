@@ -50,26 +50,92 @@ D_SP = "1 - ẢNH SẢN PHẨM"
 D_CAN = D_SP + "/1 - ẢNH SẢN PHẨM CẦN SẾP XỬ LÍ"
 D_DONE = D_SP + "/2 - ĐÃ XỬ LÍ RỒI SẾP EI!!"
 D_OUT = "2 - ĐÃ PHỐI ĐỒ XONG"
+# Tầng KÊNH (2026-10-21): mỗi kênh có bộ thư mục riêng. Danh sách kênh nằm ở _HE_THONG/_kenh.json (một chỗ duy nhất).
+KENH_MAC_DINH = ["KENH_1", "KENH_2", "KENH_3"]
+
+
+def _kenh_cfg():
+    try:
+        d = json.loads((ROOT / SYSD / "_kenh.json").read_text(encoding="utf-8"))
+        ks = [str(k).strip() for k in (d.get("kenh") or [])]
+        if not ks or any((not k) or k.startswith(("_", ".")) or re.search(r'[<>:"/\\|?*\x00-\x1f]', k) for k in ks) or len(set(ks)) != len(ks):
+            raise ValueError("danh sách kênh không hợp lệ")
+        md = d.get("mac_dinh") if d.get("mac_dinh") in ks else ks[0]
+        return ks, md
+    except Exception:
+        return list(KENH_MAC_DINH), KENH_MAC_DINH[0]
+
+
+def kenh_list():
+    return _kenh_cfg()[0]
+
+
+def kenh_default():
+    return _kenh_cfg()[1]
+
+
 # 2 đường song song: ảnh 1 người ("1 MODEL") và ảnh 2 người ("2 MODEL"), mỗi đường có đủ 3 thư mục
 N_NEW, N_VID, N_USED = "1 - MỚI PHỐI LUÔN SẾP!!", "2 - CHỜ LÀM VIDEO NÈ SẾP", "3 - ĐÃ LÀM VIDEO RỒI SẾP"
-D_OUT1 = D_OUT + "/1 MODEL"
-D_OUT2 = D_OUT + "/2 MODEL"
-D_NEW1, D_VID1, D_USED1 = D_OUT1 + "/" + N_NEW, D_OUT1 + "/" + N_VID, D_OUT1 + "/" + N_USED
-D_NEW2, D_VID2, D_USED2 = D_OUT2 + "/" + N_NEW, D_OUT2 + "/" + N_VID, D_OUT2 + "/" + N_USED
-D_NEW, D_VID, D_USED = D_NEW1, D_VID1, D_USED1  # tên cũ = đường 1 người (để các chỗ cũ và tên đường dẫn cũ vẫn hiểu)
-LANES = {"1": (D_NEW1, D_VID1, D_USED1), "2": (D_NEW2, D_VID2, D_USED2)}
-D_MODEL = "3 - KHO MODEL"
-D_MPICK = D_MODEL + "/1 - LẤY MODEL NÀY"
-D_MPICK1 = D_MPICK + "/1 MODEL"  # ảnh model 1 người (kéo thẳng ảnh vào đây)
-D_MPICK2 = D_MPICK + "/2 MODEL"  # ảnh model 2 người
-D_MALL = D_MODEL + "/2 - TOÀN BỘ ẢNH MODEL"
-D_SHARP = D_MODEL + "/3 - ẢNH ĐÃ LÀM NÉT"       # làm nét ảnh bằng RunningHub
-D_SHARP_OLD = D_SHARP + "/OLD"  # ảnh gốc sếp tải lên, chờ làm nét
-D_SHARP_NEW = D_SHARP + "/NEW"  # ảnh đã làm nét, để so sánh
 
 
 def lane_of(v):
     return "2" if str(v).strip() in ("2", "2p", "2P") else "1"
+
+
+def lane_dirs(kenh, lane="1"):
+    """(MỚI PHỐI, CHỜ LÀM VIDEO, ĐÃ LÀM VIDEO) của một kênh + một đường (1 người / 2 người)."""
+    b = D_OUT + "/" + kenh + "/" + ("2 MODEL" if lane_of(lane) == "2" else "1 MODEL")
+    return (b + "/" + N_NEW, b + "/" + N_VID, b + "/" + N_USED)
+
+
+D_MODEL = "3 - KHO MODEL"
+D_MPICK = D_MODEL + "/1 - LẤY MODEL NÀY"
+
+
+def mpick_dir(kenh, lane="1"):
+    return D_MPICK + "/" + kenh + "/" + ("2 MODEL" if lane_of(lane) == "2" else "1 MODEL")
+
+
+D_VMAU = "4 - KHO VIDEO MẪU"
+D_VMAU1 = D_VMAU + "/1 - VIDEO MẪU"  # video nhảy sếp ưng, DÙNG CHUNG các kênh
+D_VMAU2_ROOT = D_VMAU + "/2 - VIDEO MOTION CONTROL ĐÃ XONG"  # bên trong: một thư mục cho mỗi kênh
+D_POSTED_ROOT = D_VMAU + "/3 - ĐÃ ĐĂNG"  # bên trong: một thư mục cho mỗi kênh
+
+
+def vout_dir(kenh):
+    return D_VMAU2_ROOT + "/" + kenh
+
+
+def posted_dir(kenh):
+    return D_POSTED_ROOT + "/" + kenh
+
+
+def kenh_of_rel(rel):
+    """Đường dẫn trong kho thuộc kênh nào (theo thư mục), không biết thì trả None."""
+    parts = str(rel or "").replace("\\", "/").strip("/").split("/")
+    for base in (D_OUT, D_MPICK, D_VMAU2_ROOT, D_POSTED_ROOT):
+        bp = base.split("/")
+        if parts[:len(bp)] == bp and len(parts) > len(bp) and parts[len(bp)] in kenh_list():
+            return parts[len(bp)]
+    return None
+
+
+_KD = kenh_default()
+# Tên cũ (D_NEW1, D_MPICK1, D_VMAU2...) = bộ thư mục của KÊNH MẶC ĐỊNH, để các chỗ chưa chuyển sang theo-kênh vẫn chạy đúng 1 kênh
+D_OUT1 = D_OUT + "/" + _KD + "/1 MODEL"
+D_OUT2 = D_OUT + "/" + _KD + "/2 MODEL"
+D_NEW1, D_VID1, D_USED1 = lane_dirs(_KD, "1")
+D_NEW2, D_VID2, D_USED2 = lane_dirs(_KD, "2")
+D_NEW, D_VID, D_USED = D_NEW1, D_VID1, D_USED1  # tên cũ = đường 1 người
+LANES = {"1": (D_NEW1, D_VID1, D_USED1), "2": (D_NEW2, D_VID2, D_USED2)}
+D_MPICK1 = mpick_dir(_KD, "1")  # ảnh model 1 người (kéo thẳng ảnh vào đây)
+D_MPICK2 = mpick_dir(_KD, "2")  # ảnh model 2 người
+D_MALL = D_MODEL + "/2 - TOÀN BỘ ẢNH MODEL"  # kho tổng, DÙNG CHUNG
+D_SHARP = D_MODEL + "/3 - ẢNH ĐÃ LÀM NÉT"       # làm nét ảnh bằng RunningHub
+D_SHARP_OLD = D_SHARP + "/OLD"  # ảnh gốc sếp tải lên, chờ làm nét
+D_SHARP_NEW = D_SHARP + "/NEW"  # ảnh đã làm nét, để so sánh
+D_VMAU2 = vout_dir(_KD)  # video kết quả Motion Control của kênh mặc định
+D_POSTED = posted_dir(_KD)  # video đã đăng của kênh mặc định
 # tên cũ (bản trước khi đánh số) vẫn được hiểu để tiện ích / hàng phối cũ không hỏng
 LEGACY = [("ẢNH SẢN PHẨM/ẢNH SẢN PHẨM CẦN SẾP XỬ LÍ", D_CAN), ("ẢNH SẢN PHẨM/ĐÃ XỬ LÍ RỒI SẾP EI!!", D_DONE),
           ("ĐÃ PHỐI ĐỒ XONG/MỚI PHỐI LUÔN SẾP!!", D_NEW), ("ĐÃ PHỐI ĐỒ XONG/CHỜ LÀM VIDEO NÈ SẾP", D_VID),
@@ -77,12 +143,25 @@ LEGACY = [("ẢNH SẢN PHẨM/ẢNH SẢN PHẨM CẦN SẾP XỬ LÍ", D_CAN),
           ("KHO MODEL/TOÀN BỘ ẢNH MODEL", D_MALL), ("CHỜ XỬ LÝ", D_CAN),
           ("ẢNH SẢN PHẨM", D_SP), ("ĐÃ PHỐI ĐỒ XONG", D_OUT), ("KHO MODEL", D_MODEL),
           # bố cục ngày 16/10 (3 thư mục nằm thẳng trong ĐÃ PHỐI ĐỒ XONG) -> đường 1 MODEL
-          (D_OUT + "/" + N_NEW, D_NEW1), (D_OUT + "/" + N_VID, D_VID1), (D_OUT + "/" + N_USED, D_USED1)]
-D_VMAU = "4 - KHO VIDEO MẪU"
-D_VMAU1 = D_VMAU + "/1 - VIDEO MẪU"  # video nhảy sếp ưng, tải từ tiện ích về (tab VIDEO chọn từ đây)
-D_VMAU2 = D_VMAU + "/2 - VIDEO MOTION CONTROL ĐÃ XONG"  # video kết quả Motion Control (tab KẾT QUẢ VIDEO xem ở đây)
-D_POSTED = D_VMAU + "/3 - ĐÃ ĐĂNG"  # video đã đăng (bấm "Đã đăng" ở tab KẾT QUẢ thì video từ D_VMAU2 sang đây)
-LAYOUT = [D_SP, D_CAN, D_DONE, D_OUT, D_OUT1, D_OUT2, D_NEW1, D_VID1, D_USED1, D_NEW2, D_VID2, D_USED2, D_MODEL, D_MPICK, D_MPICK1, D_MPICK2, D_MALL, D_SHARP, D_SHARP_OLD, D_SHARP_NEW, D_VMAU, D_VMAU1, D_VMAU2, D_POSTED]
+          (D_OUT + "/" + N_NEW, D_NEW1), (D_OUT + "/" + N_VID, D_VID1), (D_OUT + "/" + N_USED, D_USED1),
+          # bố cục 1 kênh (trước 21/10): 1 MODEL / 2 MODEL nằm thẳng trong ĐÃ PHỐI ĐỒ XONG và LẤY MODEL NÀY
+          (D_OUT + "/1 MODEL", D_OUT1), (D_OUT + "/2 MODEL", D_OUT2),
+          (D_MPICK + "/1 MODEL", D_MPICK1), (D_MPICK + "/2 MODEL", D_MPICK2)]
+
+
+def layout_dirs():
+    out = [D_SP, D_CAN, D_DONE, D_OUT, D_MODEL, D_MPICK, D_MALL, D_SHARP, D_SHARP_OLD, D_SHARP_NEW,
+           D_VMAU, D_VMAU1, D_VMAU2_ROOT, D_POSTED_ROOT]
+    for k in kenh_list():
+        out += [D_OUT + "/" + k]
+        for ln in ("1", "2"):
+            out += [D_OUT + "/" + k + "/" + ("2 MODEL" if ln == "2" else "1 MODEL")] + list(lane_dirs(k, ln))
+            out += [mpick_dir(k, ln)]
+        out += [vout_dir(k), posted_dir(k)]
+    return out
+
+
+LAYOUT = layout_dirs()
 OLD_CAN = "CHỜ XỬ LÝ"  # tên cũ, vẫn hiểu để tiện ích cũ không hỏng
 
 ROOT.mkdir(parents=True, exist_ok=True)
@@ -121,6 +200,12 @@ def safe(rel):
         if joined == old or joined.startswith(old + "/"):
             parts = new.split("/") + [x for x in joined[len(old):].split("/") if x]
             break
+    joined = "/".join(parts)
+    for vroot in (D_VMAU2_ROOT, D_POSTED_ROOT):  # đường dẫn video kiểu 1 kênh (chưa có tên kênh) -> kênh mặc định
+        if joined.startswith(vroot + "/"):
+            rest = [x for x in joined[len(vroot) + 1:].split("/") if x]
+            if rest and rest[0] not in kenh_list():
+                parts = vroot.split("/") + [kenh_default()] + rest
     p = (ROOT.joinpath(*parts)).resolve() if parts else ROOT
     if p != ROOT and ROOT not in p.parents:
         raise ApiError("đường dẫn nằm ngoài kho")
@@ -183,9 +268,133 @@ def _hide(p):
         pass
 
 
+def _merge_move(src, dst, done):
+    """Dời src sang dst. Nếu dst đã có thì gộp từng phần, trùng tên thì đổi tên (không ghi đè). Ghi từng lần dời vào `done` để hoàn tác."""
+    if not src.exists():
+        return
+    if not dst.exists():
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(src), str(dst))
+        done.append((src, dst))
+        return
+    if src.is_dir() and dst.is_dir():
+        for c in list(src.iterdir()):
+            _merge_move(c, dst / c.name, done)
+        try:
+            src.rmdir()
+        except OSError:
+            pass
+        return
+    d2 = unique_dest(dst.parent, dst.name)
+    shutil.move(str(src), str(d2))
+    done.append((src, d2))
+
+
+def _kenh_fix_text(t):
+    """Sửa các đường dẫn kiểu 1 kênh trong một đoạn json thành đường dẫn có tên kênh mặc định (chạy lại nhiều lần vẫn an toàn)."""
+    kd = kenh_default()
+    nk = "|".join(re.escape(k) for k in kenh_list())
+    t = re.sub(r"(2 - ĐÃ PHỐI ĐỒ XONG)/(?!(?:%s)/)((?:1|2) MODEL)(?=/|\")" % nk, lambda m: "%s/%s/%s" % (m.group(1), kd, m.group(2)), t)
+    t = re.sub(r"(3 - KHO MODEL/1 - LẤY MODEL NÀY)/(?!(?:%s)/)((?:1|2) MODEL)(?=/|\")" % nk, lambda m: "%s/%s/%s" % (m.group(1), kd, m.group(2)), t)
+    for vr in (D_VMAU2_ROOT, D_POSTED_ROOT):
+        t = re.sub(re.escape(vr) + r"/(?!(?:%s)/)(?=[^/\"]+\.(?:mp4|mov|webm|m4v)\b)" % nk, lambda m, vr=vr: vr + "/" + kd + "/", t, flags=re.I)
+    return t
+
+
+def _kenh_plan():
+    """Việc cần làm để chuyển bố cục 1 kênh (cũ) sang nhiều kênh: [(nguồn, đích)] và danh sách file .json cần sửa đường dẫn."""
+    kd, names = kenh_default(), set(kenh_list())
+    mv = []
+    for base in (D_OUT, D_MPICK):
+        for nm in ("1 MODEL", "2 MODEL"):
+            src = ROOT.joinpath(*base.split("/")) / nm
+            if src.is_dir():
+                mv.append((src, ROOT.joinpath(*base.split("/")) / kd / nm))
+    for vroot in (D_VMAU2_ROOT, D_POSTED_ROOT):
+        vr = ROOT.joinpath(*vroot.split("/"))
+        if vr.is_dir():
+            for c in sorted(vr.iterdir(), key=lambda x: x.name):
+                if c.name in names or c.name.startswith((".", "_")):
+                    continue
+                mv.append((c, vr / kd / c.name))
+    js = []
+    if SYSP.is_dir():
+        for f in sorted(SYSP.glob("*.json")):
+            try:
+                t = f.read_text(encoding="utf-8")
+                if _kenh_fix_text(t) != t:
+                    js.append(f)
+            except Exception:
+                pass
+    return mv, js
+
+
+def migrate_kenh(dry=False, say=print):
+    """Chuyển kho từ bố cục 1 kênh sang nhiều kênh (dữ liệu cũ vào KÊNH MẶC ĐỊNH). Có sao lưu các file .json và nhật ký để hoàn tác.
+    dry=True: chỉ in ra sẽ làm gì, không đụng vào gì. Trả về số mục sẽ / đã dời."""
+    mv, js = _kenh_plan()
+    if dry:
+        for a, b in mv:
+            say("  sẽ dời: %s  ->  %s" % ("/".join(a.relative_to(ROOT).parts), "/".join(b.relative_to(ROOT).parts)))
+        for f in js:
+            say("  sẽ sửa đường dẫn trong: %s" % f.name)
+        return len(mv) + len(js)
+    if not mv and not js:
+        return 0
+    SYSP.mkdir(exist_ok=True)
+    ts = time.strftime("%Y%m%d_%H%M%S")
+    bk = SYSP / ("_sao_luu_kenh_" + ts)
+    bk.mkdir(exist_ok=True)
+    for f in SYSP.glob("*.json"):
+        shutil.copy2(str(f), str(bk / f.name))
+    done = []
+    for a, b in mv:
+        _merge_move(a, b, done)
+    for f in js:
+        f.write_text(_kenh_fix_text(f.read_text(encoding="utf-8")), encoding="utf-8")
+    logf = SYSP / "_doi_kenh_nhat_ky.json"
+    try:
+        log = json.loads(logf.read_text(encoding="utf-8"))
+    except Exception:
+        log = []
+    log.append({"t": ts, "backup": bk.name, "moves": [["/".join(a.relative_to(ROOT).parts), "/".join(b.relative_to(ROOT).parts)] for a, b in done], "undone": False})
+    logf.write_text(json.dumps(log, ensure_ascii=False, indent=1), encoding="utf-8")
+    say("Đã chuyển %d mục và sửa %d file ghi nhớ sang bố cục nhiều kênh (dữ liệu cũ vào %s). Sao lưu: %s" % (len(done), len(js), kenh_default(), bk.name))
+    return len(done) + len(js)
+
+
+def undo_kenh(say=print):
+    """Hoàn tác lần chuyển gần nhất: đưa file về chỗ cũ và trả các file .json về bản sao lưu."""
+    logf = SYSP / "_doi_kenh_nhat_ky.json"
+    try:
+        log = json.loads(logf.read_text(encoding="utf-8"))
+    except Exception:
+        say("Chưa có lần chuyển nào để hoàn tác.")
+        return 0
+    cur = next((x for x in reversed(log) if not x.get("undone")), None)
+    if not cur:
+        say("Các lần chuyển đều đã hoàn tác rồi.")
+        return 0
+    n = 0
+    for old, new in reversed(cur["moves"]):
+        src, dst = ROOT.joinpath(*new.split("/")), ROOT.joinpath(*old.split("/"))
+        if src.exists():
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            d2 = dst if not dst.exists() else unique_dest(dst.parent, dst.name)
+            shutil.move(str(src), str(d2))
+            n += 1
+    for f in (SYSP / cur["backup"]).glob("*.json"):
+        shutil.copy2(str(f), str(SYSP / f.name))
+    cur["undone"] = True
+    logf.write_text(json.dumps(log, ensure_ascii=False, indent=1), encoding="utf-8")
+    say("Đã hoàn tác: đưa %d mục về chỗ cũ, trả các file ghi nhớ về bản sao lưu %s." % (n, cur["backup"]))
+    return n
+
+
 def ensure_layout():
     """Tạo đủ thư mục mới và dời dữ liệu cũ vào đúng chỗ (an toàn khi chạy nhiều lần)."""
     SYSP.mkdir(exist_ok=True)
+    migrate_kenh()
     try:
         (SYSP / "_viec_cho.json").unlink()  # mỗi lần bật lại bảng điều khiển: bỏ các việc phối còn nằm chờ từ lần trước
     except OSError:
@@ -226,7 +435,7 @@ def ensure_layout():
         _ren(ROOT / pn[0] / po[1], ROOT / new)
     (ROOT / D_VMAU).mkdir(parents=True, exist_ok=True)
     _ren(ROOT / "ĐÃ ĐĂNG", ROOT / D_POSTED)  # thư mục "ĐÃ ĐĂNG" cũ nằm ở gốc kho -> vào 4 - KHO VIDEO MẪU / 3 - ĐÃ ĐĂNG
-    for r in LAYOUT:
+    for r in layout_dirs():
         (ROOT / r).mkdir(parents=True, exist_ok=True)
     # 3 thư mục cũ nằm thẳng trong ĐÃ PHỐI ĐỒ XONG -> vào 1 MODEL
     for nm, new in ((N_NEW, D_NEW1), (N_VID, D_VID1), (N_USED, D_USED1)):
@@ -235,7 +444,7 @@ def ensure_layout():
     mb, md = ROOT.joinpath(*D_MPICK.split("/")), ROOT / D_MPICK1
     try:
         for c in list(mb.iterdir()):
-            if c.name in ("1 MODEL", "2 MODEL") or c.name.startswith(("_", ".")):
+            if c.name in ("1 MODEL", "2 MODEL") or c.name in kenh_list() or c.name.startswith(("_", ".")):
                 continue
             if c.is_file() and c.suffix.lower() in IMG_EXT:
                 shutil.move(str(c), str(unique_dest(md, c.name)))
@@ -3093,11 +3302,22 @@ def local_ips():
 
 
 if __name__ == "__main__":
+    if "--doi-kenh-thu" in sys.argv:   # chỉ xem sẽ dời gì, không làm gì
+        print("CHẠY THỬ (chưa dời gì). Kho:", ROOT)
+        n = migrate_kenh(dry=True)
+        print("Không có gì cần dời." if not n else "Tổng cộng %d mục. Muốn dời thật: bật bảng điều khiển bình thường." % n)
+        sys.exit(0)
+    if "--hoan-tac-kenh" in sys.argv:
+        undo_kenh()
+        sys.exit(0)
     ensure_layout()
     BACKUP_DIR.mkdir(parents=True, exist_ok=True)
-    threading.Thread(target=ensure_motion_control, daemon=True).start()
+    THU = os.environ.get("CHE_DO_THU") == "1"   # bản chạy thử riêng: không tự bật Motion Control / Chrome, không đụng bản đang chạy
+    if not THU:
+        threading.Thread(target=ensure_motion_control, daemon=True).start()
     threading.Thread(target=sharp_worker, daemon=True).start()   # làm nét ảnh: chỉ chạy ảnh sếp đã bấm Chạy / Làm lại
-    threading.Thread(target=update_ytdlp, daemon=True).start()   # TikTok hay đổi: cập nhật yt-dlp theo cộng đồng (tối đa 1 lần / 2 ngày)
+    if not THU:
+        threading.Thread(target=update_ytdlp, daemon=True).start()   # TikTok hay đổi: cập nhật yt-dlp theo cộng đồng (tối đa 1 lần / 2 ngày)
     threading.Thread(target=vj_watch, daemon=True).start()
     print("=" * 66)
     print(" BẢNG ĐIỀU KHIỂN - dây chuyền tự động làm video")
@@ -3107,7 +3327,10 @@ if __name__ == "__main__":
     for ip in local_ips():
         print(" Mở trên điện thoại (cùng Wi-Fi hoặc Tailscale): http://%s:%d/?key=%s" % (ip, PORT, KEY))
     print("=" * 66)
-    threading.Timer(9.0, open_chrome_if_needed).start()   # đợi ~9 giây để biết đã có trang bảng điều khiển nào mở sẵn chưa
+    if THU:
+        print(" ĐANG CHẠY BẢN THỬ NGHIỆM (kho riêng, cổng riêng). Bản chính của sếp không bị đụng tới.")
+    else:
+        threading.Timer(9.0, open_chrome_if_needed).start()   # đợi ~9 giây để biết đã có trang bảng điều khiển nào mở sẵn chưa
     try:
         BigQueueServer(("0.0.0.0", PORT), H).serve_forever()
     except OSError as e:
