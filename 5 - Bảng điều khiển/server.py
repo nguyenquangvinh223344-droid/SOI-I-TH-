@@ -225,6 +225,11 @@ def clean_name(n):
     return n[:120]
 
 
+def is_system_rel(rel):
+    """Thư mục của chính chương trình (bố cục kho + từng KÊNH + _HE_THONG): không cho xóa / đổi tên / chuyển đi."""
+    return rel in set(layout_dirs()) or rel == SYSD
+
+
 def is_product(p):
     return (p / "_sp.json").is_file()
 
@@ -875,6 +880,11 @@ def api_app_open(q, body):
     return {"ok": True, "pages": [{"name": n, "url": v["url"], "focus": v["focus"]} for n, v in _pages_want.items()]}
 
 
+def api_kenh(q, body):
+    """Danh sách kênh (lấy từ _HE_THONG/_kenh.json) để trang không phải viết cứng tên kênh."""
+    return {"ok": True, "kenh": kenh_list(), "mac_dinh": kenh_default()}
+
+
 def api_ping(q, body):
     total = count_products(ROOT, 100000)
     return {"ok": True, "kho": str(ROOT), "san_pham": total, "pillow": bool(Image), "ui": _ui_ver(), "canvas_alive": canvas_alive(), "mc_ready": mc_state()["mc"], "comfy_ready": mc_state()["comfy"], "comfy_wanted": START_COMFY, "canvas_ago": int(time.time() - _canvas_seen[0]) if _canvas_seen[0] else None}
@@ -983,6 +993,8 @@ def api_move(q, body):
         src = safe(r)
         if src == ROOT or not src.exists():
             continue
+        if is_system_rel(rel_of(src)):
+            raise ApiError("\"%s\" là thư mục hệ thống, không chuyển đi được" % src.name)
         if src == dest or src in dest.parents:
             raise ApiError("không thể chuyển một thư mục vào chính nó")
         if src.parent == dest:
@@ -997,6 +1009,8 @@ def api_rename(q, body):
     src = safe(body.get("path"))
     if src == ROOT or not src.exists():
         raise ApiError("không tìm thấy")
+    if is_system_rel(rel_of(src)):
+        raise ApiError("\"%s\" là thư mục hệ thống, không đổi tên được" % src.name)
     d = src.parent / clean_name(body.get("name"))
     if d.exists():
         raise ApiError("đã có tên này")
@@ -1025,7 +1039,7 @@ def api_delete(q, body):
     out = []
     for r in body.get("items") or []:
         src = safe(r)
-        if src == ROOT or not src.exists() or src == t or src == SYSP or src.name in (TRASH, THUMBS) or rel_of(src) in LAYOUT:
+        if src == ROOT or not src.exists() or src == t or src == SYSP or src.name in (TRASH, THUMBS) or is_system_rel(rel_of(src)):
             continue
         try:
             if hard:
@@ -1912,10 +1926,9 @@ def api_model_lock(q, body):
 
 def api_model_copy(q, body):
     """Sao chép (KHÔNG di chuyển) ảnh từ "2 - TOÀN BỘ ẢNH MODEL" sang 1 MODEL hoặc 2 MODEL, giữ nguyên file gốc 100% (không nén, không đổi gì)."""
-    to = str(body.get("to") or "")
-    if not ((to + "/").startswith(D_MPICK1 + "/") or (to + "/").startswith(D_MPICK2 + "/")):
-        raise ApiError("Chỉ sao chép vào 1 MODEL hoặc 2 MODEL")
-    dst = safe(to)
+    dst = safe(str(body.get("to") or ""))   # safe() đã hiểu đường dẫn kiểu 1 kênh (cũ) và đổi sang kênh mặc định
+    if rel_of(dst) not in {mpick_dir(k, ln) for k in kenh_list() for ln in ("1", "2")}:
+        raise ApiError("Chỉ sao chép vào thư mục 1 MODEL hoặc 2 MODEL của một kênh")
     dst.mkdir(parents=True, exist_ok=True)
     n = 0
     for rel in (body.get("from") or [])[:500]:
@@ -3139,7 +3152,7 @@ def sharp_worker():
             time.sleep(5)
 
 
-ROUTES = {"ping": api_ping, "alltree": api_alltree, "tree": api_tree, "product": api_product, "mkdir": api_mkdir, "move": api_move, "rename": api_rename,
+ROUTES = {"ping": api_ping, "kenh": api_kenh, "alltree": api_alltree, "tree": api_tree, "product": api_product, "mkdir": api_mkdir, "move": api_move, "rename": api_rename,
           "delete": api_delete, "state": api_state, "group": api_group, "newproduct": api_newproduct, "find": api_find, "queue": api_queue,
           "settings": api_settings, "links": api_links, "sharp": api_sharp, "model_all": api_model_all, "model_store": api_model_store, "model_lock": api_model_lock, "model_copy": api_model_copy, "dlvideo": api_dlvideo, "doithu": api_doithu, "kalo": api_kalo, "phoi": api_phoi, "results": api_results, "result_do": api_result_do,
           "result_move": api_result_move, "models": api_models, "launch": api_launch, "video": api_video, "estimate": api_estimate, "rh_balance": api_rh_balance, "app_open": api_app_open, "fix": api_fix, "ext_log": api_ext_log, "video_mau": api_video_mau, "video_out": api_video_out, "video_posted": api_video_posted, "video_run": api_video_run, "video_jobs": api_video_jobs, "job_next": api_job_next, "job_done": api_job_done, "notice": api_notice}

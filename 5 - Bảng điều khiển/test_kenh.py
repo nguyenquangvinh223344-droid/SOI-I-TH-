@@ -210,5 +210,49 @@ class KhoTam(unittest.TestCase):
         self.assertEqual(len([x for x in S.SYSP.iterdir() if x.name.startswith("_sao_luu_kenh_")]), 2)
 
 
+    def test_14_api_kenh_trả_danh_sách_và_mặc_định(self):
+        r = S.api_kenh({}, None)
+        self.assertEqual(r["kenh"], ["KENH_1", "KENH_2", "KENH_3"])
+        self.assertEqual(r["mac_dinh"], "KENH_1")
+        self.assertIn("kenh", S.ROUTES)
+        (S.SYSP / "_kenh.json").write_text(json.dumps({"kenh": ["A", "B"], "mac_dinh": "B"}), encoding="utf-8")
+        self.assertEqual(S.api_kenh({}, None)["kenh"], ["A", "B"])
+
+    def test_15_sao_chép_model_vào_thư_mục_của_từng_kênh(self):
+        S.ensure_layout()
+        src = touch(self.p(S.D_MALL + "/m.jpg"))
+        for k in ("KENH_1", "KENH_2", "KENH_3"):
+            for ln in ("1", "2"):
+                r = S.api_model_copy({}, {"to": S.mpick_dir(k, ln), "from": [S.D_MALL + "/m.jpg"]})
+                self.assertEqual(r["copied"], 1)
+                self.assertTrue(self.p(S.mpick_dir(k, ln) + "/m.jpg").is_file())
+        self.assertTrue(src.is_file(), "bản gốc ở kho tổng phải còn")
+        # tên cũ (kiểu 1 kênh) -> kênh mặc định
+        S.api_model_copy({}, {"to": S.D_MPICK + "/1 MODEL", "from": [S.D_MALL + "/m.jpg"]})
+        self.assertTrue(self.p(S.mpick_dir("KENH_1", "1") + "/m (2).jpg").is_file())
+        # nơi đến sai thì từ chối
+        for bad in (S.D_MPICK, S.D_MPICK + "/KENH_2", S.D_MPICK + "/KENH_9/1 MODEL", S.D_MALL, S.D_OUT + "/KENH_1/1 MODEL"):
+            with self.assertRaises(S.ApiError, msg=bad):
+                S.api_model_copy({}, {"to": bad, "from": [S.D_MALL + "/m.jpg"]})
+
+    def test_16_thư_mục_kênh_được_bảo_vệ(self):
+        S.ensure_layout()
+        k2 = S.D_OUT + "/KENH_2"
+        for rel in (k2, k2 + "/1 MODEL", S.mpick_dir("KENH_3", "2"), S.vout_dir("KENH_2"), S.posted_dir("KENH_1"), S.lane_dirs("KENH_2", "1")[0]):
+            with self.assertRaises(S.ApiError, msg=rel):
+                S.api_rename({}, {"path": rel, "name": "doi ten"})
+            with self.assertRaises(S.ApiError, msg=rel):
+                S.api_move({}, {"to": S.D_CAN, "items": [rel]})
+            S.api_delete({}, {"items": [rel], "hard": True})
+            self.assertTrue(self.p(rel).is_dir(), "xóa không được làm mất thư mục hệ thống: " + rel)
+        # thư mục thường vẫn xóa / đổi tên được
+        sp = self.p(S.D_CAN + "/abc")
+        sp.mkdir(parents=True)
+        S.api_rename({}, {"path": S.D_CAN + "/abc", "name": "xyz"})
+        self.assertTrue(self.p(S.D_CAN + "/xyz").is_dir())
+        S.api_delete({}, {"items": [S.D_CAN + "/xyz"]})
+        self.assertFalse(self.p(S.D_CAN + "/xyz").exists())
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

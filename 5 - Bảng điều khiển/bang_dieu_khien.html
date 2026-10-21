@@ -709,6 +709,7 @@ const ICONS = {
   'box': '<path d="M12 3 4 7.5v9L12 21l8-4.5v-9L12 3Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9M8 5.25l8 4.5"/>',
   'grid': '<rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/>',
   'queue': '<rect x="4" y="4" width="16" height="5" rx="2"/><path d="M6 13h12M8 17.5h8"/>',
+  'tv': '<rect x="3" y="5" width="18" height="12" rx="2.5"/><path d="M8 20.5h8M12 17v3.5"/>',
   'move': '<path d="M9 17H5.5A2.5 2.5 0 0 1 3 14.5v-8A2.5 2.5 0 0 1 5.5 4h3.38a2 2 0 0 1 1.42.59l1.12 1.12c.38.37.89.58 1.42.58H17.5A2.5 2.5 0 0 1 20 8.8v1.7"/><path d="M13 16h8m0 0-3-3m3 3-3 3"/>',
   // --- Thời trang & media ---
   'shirt': '<path d="M8.5 4 4 6.5 5.5 11 8 9.5V19a1.5 1.5 0 0 0 1.5 1.5h5A1.5 1.5 0 0 0 16 19V9.5l2.5 1.5L20 6.5 15.5 4a3.5 3.5 0 0 1-7 0Z"/>',
@@ -785,12 +786,34 @@ window.addEventListener('popstate', (e) => { if (lbIgnorePop) { lbIgnorePop = fa
 try { history.replaceState({ cur: '' }, '', location.pathname + location.search); } catch (e) { /* bỏ qua */ }
 
 // biểu tượng SVG + màu riêng cho 4 thư mục lớn (màu hợp bảng Lavender / Tối dịu) và thư mục "3 - ĐÃ ĐĂNG" trong kho video
-const LOCKED = (() => {
-  const SP = '1 - ẢNH SẢN PHẨM', OUT = '2 - ĐÃ PHỐI ĐỒ XONG', MOD = '3 - KHO MODEL', VM = '4 - KHO VIDEO MẪU';
-  const s = new Set([SP, SP + '/1 - ẢNH SẢN PHẨM CẦN SẾP XỬ LÍ', SP + '/2 - ĐÃ XỬ LÍ RỒI SẾP EI!!', OUT, OUT + '/1 MODEL', OUT + '/2 MODEL', MOD, MOD + '/1 - LẤY MODEL NÀY', MOD + '/1 - LẤY MODEL NÀY/1 MODEL', MOD + '/1 - LẤY MODEL NÀY/2 MODEL', MOD + '/2 - TOÀN BỘ ẢNH MODEL', MOD + '/3 - ẢNH ĐÃ LÀM NÉT', MOD + '/3 - ẢNH ĐÃ LÀM NÉT/OLD', MOD + '/3 - ẢNH ĐÃ LÀM NÉT/NEW', VM, VM + '/1 - VIDEO MẪU', VM + '/2 - VIDEO MOTION CONTROL ĐÃ XONG', VM + '/3 - ĐÃ ĐĂNG']);
-  ['1 MODEL', '2 MODEL'].forEach((l) => ['1 - MỚI PHỐI LUÔN SẾP!!', '2 - CHỜ LÀM VIDEO NÈ SẾP', '3 - ĐÃ LÀM VIDEO RỒI SẾP'].forEach((n) => s.add(OUT + '/' + l + '/' + n)));
-  return s;
-})();
+// ---- KÊNH: danh sách lấy từ server (không viết cứng tên kênh ở đây) ----
+let KENH = [], KENH_MD = '';
+const KENH_ROOTS = ['2 - ĐÃ PHỐI ĐỒ XONG', '3 - KHO MODEL/1 - LẤY MODEL NÀY', '4 - KHO VIDEO MẪU/2 - VIDEO MOTION CONTROL ĐÃ XONG', '4 - KHO VIDEO MẪU/3 - ĐÃ ĐĂNG'];
+const KENH_COL = ['#8b6fd6', '#d67a8f', '#3b9f94', '#c4903a', '#4b7bd6', '#8a8f98'];
+const kenhCol = (k) => KENH_COL[Math.max(0, KENH.indexOf(k)) % KENH_COL.length];
+const isKenhDir = (rel) => KENH_ROOTS.some((r) => KENH.some((k) => rel === r + '/' + k));
+const kenhOf = (rel) => { rel = String(rel || ''); for (const r of KENH_ROOTS) if (rel.startsWith(r + '/')) { const k = rel.slice(r.length + 1).split('/')[0]; if (KENH.includes(k)) return k; } return ''; };
+// thư mục "LẤY MODEL NÀY/<kênh>/1 MODEL|2 MODEL" -> { kenh, lane } (không phải thì null)
+const pickInfo = (rel) => { const b = '3 - KHO MODEL/1 - LẤY MODEL NÀY/'; rel = String(rel || ''); if (!rel.startsWith(b)) return null; const p = rel.slice(b.length).split('/'); return p.length === 2 && KENH.includes(p[0]) && (p[1] === '1 MODEL' || p[1] === '2 MODEL') ? { kenh: p[0], lane: p[1][0] } : null; };
+// thư mục hệ thống (không xóa / đổi tên / chuyển): 4 thư mục lớn + thư mục con cố định + TỪNG KÊNH
+const LOCKED = new Set();
+function fillLocked() {
+  const SP = '1 - ẢNH SẢN PHẨM', OUT = '2 - ĐÃ PHỐI ĐỒ XONG', MOD = '3 - KHO MODEL', VM = '4 - KHO VIDEO MẪU', PK = MOD + '/1 - LẤY MODEL NÀY';
+  LOCKED.clear();
+  [SP, SP + '/1 - ẢNH SẢN PHẨM CẦN SẾP XỬ LÍ', SP + '/2 - ĐÃ XỬ LÍ RỒI SẾP EI!!', OUT, MOD, PK, MOD + '/2 - TOÀN BỘ ẢNH MODEL', MOD + '/3 - ẢNH ĐÃ LÀM NÉT', MOD + '/3 - ẢNH ĐÃ LÀM NÉT/OLD', MOD + '/3 - ẢNH ĐÃ LÀM NÉT/NEW', VM, VM + '/1 - VIDEO MẪU', VM + '/2 - VIDEO MOTION CONTROL ĐÃ XONG', VM + '/3 - ĐÃ ĐĂNG'].forEach((x) => LOCKED.add(x));
+  KENH.forEach((k) => {
+    [OUT + '/' + k, PK + '/' + k, VM + '/2 - VIDEO MOTION CONTROL ĐÃ XONG/' + k, VM + '/3 - ĐÃ ĐĂNG/' + k].forEach((x) => LOCKED.add(x));
+    ['1 MODEL', '2 MODEL'].forEach((l) => {
+      LOCKED.add(OUT + '/' + k + '/' + l); LOCKED.add(PK + '/' + k + '/' + l);
+      ['1 - MỚI PHỐI LUÔN SẾP!!', '2 - CHỜ LÀM VIDEO NÈ SẾP', '3 - ĐÃ LÀM VIDEO RỒI SẾP'].forEach((n) => LOCKED.add(OUT + '/' + k + '/' + l + '/' + n));
+    });
+  });
+}
+fillLocked();
+async function loadKenh() {
+  try { const r = await api('kenh'); KENH = r.kenh || []; KENH_MD = r.mac_dinh || KENH[0] || ''; } catch (e) { /* server bản cũ: coi như chưa có kênh */ }
+  fillLocked();
+}
 const FOLDER_LOOK = [
   [/^1 - [^/]+$/, 'box', '#6a58a6'], [/^2 - [^/]+$/, 'shirt', '#c0708a'], [/^3 - [^/]+$/, 'user', '#3b8f9b'], [/^4 - [^/]+$/, 'film', '#c4903a'],
   // 1 - ẢNH SẢN PHẨM: cần xử lí (khay, vàng) / đã xử lí (dấu tích, xanh lá)
@@ -805,7 +828,7 @@ const FOLDER_LOOK = [
   // 4 - KHO VIDEO MẪU: video mẫu (bảng clapper) / video Motion Control xong (cuộn phim) / đã đăng (máy bay giấy, giống nhóm Đã đăng ở tab Kết quả)
   [/^4 - KHO VIDEO MẪU\/1 - VIDEO MẪU$/, 'clapper', '#c4903a'], [/^4 - KHO VIDEO MẪU\/2 - VIDEO MOTION CONTROL ĐÃ XONG$/, 'film', '#6a58a6'], [/^4 - KHO VIDEO MẪU\/3 - ĐÃ ĐĂNG$/, 'send', '#16a34a']
 ];
-const folderLook = (rel) => FOLDER_LOOK.find((x) => x[0].test(rel));
+const folderLook = (rel) => isKenhDir(rel) ? [null, 'tv', kenhCol(rel.split('/').pop())] : FOLDER_LOOK.find((x) => x[0].test(rel));
 const folderStyle = (rel) => { const l = folderLook(rel); return l ? ' style="border-left:6px solid ' + l[2] + '"' : ''; };
 const folderIcon = (rel) => { const l = folderLook(rel); return l ? '<span class="ftile" style="color:' + l[2] + ';background:' + l[2] + '26">' + ic(l[1], 24) + '</span>' : ic('folder', 30); };
 const folderCap = (f) => /^4 - KHO VIDEO MẪU/.test(f.rel) ? (f.nvid || 0) + ' video' : /^1 - ẢNH SẢN PHẨM/.test(f.rel) || (CTX() === 'prod' && !/^[23] - /.test(f.rel)) ? f.count + ' sản phẩm' : (f.nimg || 0) + ' ảnh';
@@ -2464,8 +2487,7 @@ async function renderNet(opt) {
 }
 setInterval(() => { if (tab === 'net' && !document.querySelector('#ntCmp')) renderNet({ quiet: true }); }, 3000);
 // ================== KHO MODEL: nút tải 2 lựa chọn · giữ ảnh để đổi tên / xóa · Phối đồ: ổ khóa model ==================
-const MP1 = '3 - KHO MODEL/1 - LẤY MODEL NÀY/1 MODEL', MP2 = '3 - KHO MODEL/1 - LẤY MODEL NÀY/2 MODEL';
-const isPickFolder = () => cur === MP1 || cur === MP2;
+const isPickFolder = () => !!pickInfo(cur);
 const mdFile = (rel, w) => '/file?path=' + enc(rel) + (w ? '&w=' + w : '') + '&key=' + enc(KEY);
 function mdUpMenu(btn) {
   const old = $('#mdMenu'); if (old) { old.remove(); btn.classList.remove('spun'); return; }
@@ -2482,7 +2504,7 @@ function mdUpMenu(btn) {
 async function mdStorePick() {
   let items, have;
   try { items = (await api('model_store')).items; have = new Set(((await api('tree?path=' + enc(cur))).loose || []).map(String)); } catch (e) { toast(e.message); return; }
-  const dest = cur, label = dest === MP1 ? '1 MODEL' : '2 MODEL', picked = new Set();
+  const dest = cur, pk = pickInfo(dest), label = pk ? pk.kenh + ' › ' + pk.lane + ' MODEL' : 'thư mục này', picked = new Set();
   const o = document.createElement('div'); o.id = 'mdPick';
   const draw = () => {
     o.innerHTML = '<div class="mph"><b>Chọn model từ kho</b><small>sẽ sao chép vào ' + label + ' (bản gốc ở kho vẫn giữ)</small></div>' +
@@ -2540,7 +2562,7 @@ async function mpkOpen(lane) {
   };
   document.body.appendChild(o); draw();
 }
-ping(); refreshQ(); refreshR(); render();
+ping(); refreshQ(); refreshR(); loadKenh().then(() => render());
 setTimeout(() => { try { rhPlanLoad(); } catch (e) { /* bỏ qua */ } }, 4000); setInterval(() => { try { rhPlanLoad(); } catch (e) { /* bỏ qua */ } }, 600000);
 setInterval(() => { if (tab === 'video' && !document.hidden) { try { vBalLoad(); rhPlanLoad(); } catch (e) { /* bỏ qua */ } } }, 30000);   // đang ở tab Video: số dư và kế hoạch cập nhật mỗi 30 giây
 setInterval(() => { if (tab === 'kho' && !document.querySelector('.modal.on') && !selMode) renderKho({ quiet: true }); }, 6000); // tự làm mới: thấy thay đổi làm bằng File Explorer
