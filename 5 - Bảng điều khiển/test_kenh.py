@@ -173,5 +173,42 @@ class KhoTam(unittest.TestCase):
         self.assertTrue(b.is_file(), "ảnh model của kênh 2 không được bị gom sang kênh 1")
 
 
+    def chup(self):
+        """Ảnh chụp kho: {đường dẫn đầy đủ: nội dung} của mọi file, trừ nhật ký và thư mục sao lưu của chính chương trình dời kênh."""
+        out = {}
+        for f in sorted(self.tmp.rglob("*")):
+            rel = "/".join(f.relative_to(self.tmp).parts)
+            if not f.is_file() or "_sao_luu_kenh_" in rel or rel.endswith("_doi_kenh_nhat_ky.json"):
+                continue
+            out[rel] = f.read_bytes()
+        return out
+
+    def test_11_dời_bật_lại_hoàn_tác_về_y_nguyên(self):
+        self.dung_kho_cu()
+        truoc = self.chup()
+        S.ensure_layout()                      # dời
+        nk = (S.SYSP / "_doi_kenh_nhat_ky.json").read_bytes()
+        S.ensure_layout()                      # bật lại (lần 2, lần 3): không được sửa nhật ký, không sao lưu thêm
+        S.ensure_layout()
+        self.assertEqual((S.SYSP / "_doi_kenh_nhat_ky.json").read_bytes(), nk, "nhật ký bị sửa khi bật lại")
+        self.assertEqual(len([x for x in S.SYSP.iterdir() if x.name.startswith("_sao_luu_kenh_")]), 1, "bật lại không được tạo thêm sao lưu")
+        n = S.undo_kenh(say=lambda *_: None)
+        self.assertGreater(n, 0)
+        self.assertEqual(self.chup(), truoc, "sau hoàn tác, đường dẫn đầy đủ và nội dung mọi file phải giống hệt ban đầu")
+
+    def test_12_không_có_gì_để_dời_thì_không_tạo_sao_lưu(self):
+        S.ensure_layout()
+        S.ensure_layout()
+        self.assertEqual([x for x in S.SYSP.iterdir() if x.name.startswith("_sao_luu_kenh_")], [])
+        self.assertFalse((S.SYSP / "_doi_kenh_nhat_ky.json").exists())
+
+    def test_13_hai_lần_dời_cách_nhau_vẫn_không_trùng_tên_sao_lưu(self):
+        self.dung_kho_cu()
+        S.ensure_layout()
+        touch(self.p(S.D_OUT + "/1 MODEL/" + S.N_NEW + "/moi__1.png"))   # lại xuất hiện dữ liệu kiểu cũ trong cùng giây
+        S.ensure_layout()
+        self.assertEqual(len([x for x in S.SYSP.iterdir() if x.name.startswith("_sao_luu_kenh_")]), 2)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

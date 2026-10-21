@@ -301,6 +301,9 @@ def _kenh_fix_text(t):
     return t
 
 
+KENH_FILE_BO_QUA = {"_doi_kenh_nhat_ky.json"}   # (các thư mục _sao_luu_kenh_* nằm trong _HE_THONG nên không bị glob("*.json") quét tới)
+
+
 def _kenh_plan():
     """Việc cần làm để chuyển bố cục 1 kênh (cũ) sang nhiều kênh: [(nguồn, đích)] và danh sách file .json cần sửa đường dẫn."""
     kd, names = kenh_default(), set(kenh_list())
@@ -320,6 +323,8 @@ def _kenh_plan():
     js = []
     if SYSP.is_dir():
         for f in sorted(SYSP.glob("*.json")):
+            if f.name in KENH_FILE_BO_QUA:   # nhật ký dời kênh chứa đường dẫn kiểu cũ CÓ CHỦ ĐÍCH (để hoàn tác), không được sửa
+                continue
             try:
                 t = f.read_text(encoding="utf-8")
                 if _kenh_fix_text(t) != t:
@@ -343,8 +348,11 @@ def migrate_kenh(dry=False, say=print):
         return 0
     SYSP.mkdir(exist_ok=True)
     ts = time.strftime("%Y%m%d_%H%M%S")
-    bk = SYSP / ("_sao_luu_kenh_" + ts)
-    bk.mkdir(exist_ok=True)
+    bk, k = SYSP / ("_sao_luu_kenh_" + ts), 1
+    while bk.exists():   # hai lần dời trong cùng một giây vẫn ra hai thư mục sao lưu khác nhau
+        k += 1
+        bk = SYSP / ("_sao_luu_kenh_%s_%d" % (ts, k))
+    bk.mkdir()
     for f in SYSP.glob("*.json"):
         shutil.copy2(str(f), str(bk / f.name))
     done = []
