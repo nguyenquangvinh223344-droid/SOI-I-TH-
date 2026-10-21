@@ -1,0 +1,21 @@
+.img-input { padding: 0 24px 8px; }
+#linkBox { width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-1); color: var(--text); font-size: 12px; resize: vertical; }
+.img-actions { display: flex; gap: 8px; margin-top: 8px; }
+#imgRows { padding: 0 24px 90px; }
+.prow { border: 1px solid var(--border); border-radius: 12px; background: var(--card); padding: 12px; margin-bottom: 12px; }
+.prow-head { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+.prow-title { font-size: 13px; font-weight: 800; flex: 1; min-width: 200px; white-space: normal; line-height: 1.3; }
+.prow-src { font-size: 10px; color: var(--text-dim); }
+.prow-head select, .prow-head button { font-size: 12px; }
+.prow-head select { padding: 5px 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-1); color: var(--text); }
+.pimgs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+.tile { flex: none; width: 124px; text-align: center; }
+.tile img { width: 124px; height: 124px; object-fit: cover; border-radius: 8px; background: var(--bg-1); display: block; }
+.tile.locked img { opacity: .25; filter: grayscale(1); }
+.lock-btn { margin-top: 5px; width: 100%; border: 1px solid var(--border); background: var(--bg-1); color: var(--text); border-radius: 8px; padding: 4px 0; font-size: 15px; cursor: pointer; }
+.tile.locked .lock-btn { background: rgba(239, 68, 68, .15); }
+.export-bar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 10px; align-items: center; justify-content: flex-end; padding: 12px 24px; background: var(--card); border-top: 1px solid var(--border); font-size: 12px; }
+.export-bar span { margin-right: auto; color: var(--text-dim); }
+body.embed .topbar { display: none; }
+
+.link-off { opacity: .45; }

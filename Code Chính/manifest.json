@@ -1,0 +1,89 @@
+{
+  "manifest_version": 3,
+  "name": "Quangg Ving Scanner Pro",
+  "version": "1.1.0",
+  "description": "Soi kênh TikTok tự động để tìm clip/sản phẩm win.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "scripting",
+    "downloads",
+    "alarms",
+    "clipboardWrite",
+    "contextMenus",
+    "unlimitedStorage"
+  ],
+  "host_permissions": [
+    "https://www.tiktok.com/*",
+    "https://www.tikwm.com/*",
+    "https://tiktoday.vn/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*",
+    "https://*.ibyteimg.com/*",
+    "https://*.tiktokcdn.com/*",
+    "https://*.tiktokcdn-us.com/*",
+    "https://*.byteimg.com/*",
+    "https://api.qrserver.com/*",
+    "https://www.kalodata.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.kalodata.com/*"
+      ],
+      "js": [
+        "kalodata.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.kalodata.com/*"
+      ],
+      "js": [
+        "kalodata_main.js"
+      ],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://tiktoday.vn/*"
+      ],
+      "js": [
+        "tiktoday_qr.js"
+      ],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://www.tiktok.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://*.scf.usercontent.goog/*",
+        "https://*.googleusercontent.com/*"
+      ],
+      "all_frames": true,
+      "match_about_blank": true,
+      "match_origin_as_fallback": true,
+      "run_at": "document_idle",
+      "js": [
+        "canvas_bridge.js"
+      ]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Quangg Ving Scanner Pro"
+  }
+}

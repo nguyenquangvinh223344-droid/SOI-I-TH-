@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>Quangg Ving Scanner Pro • Clip & Shop</title>
+  <link rel="stylesheet" href="viewer.css" />
+</head>
+<body>
+  <header class="vtop">
+    <div class="vtop-row">
+      <div class="logo">QUANGG VING <span class="chip-green">CLIP & SHOP</span></div>
+      <button id="btnThemeToggle" class="theme-toggle" title="Đổi sáng/tối">🌙</button>
+    </div>
+    <div class="caption" id="vCaption">—</div>
+  </header>
+
+  <div class="nav-row">
+    <button id="btnPrev" class="btn btn-ghost">↑ Clip trước</button>
+    <button id="btnNext" class="btn btn-ghost">↓ Clip tiếp</button>
+  </div>
+
+  <div class="main-area">
+    <div class="player-wrap">
+      <div id="loadingBox" class="loading-box">
+        <div class="spinner"></div>
+        <div>Đang nạp video từ TikWM…</div>
+      </div>
+      <video id="player" controls style="display:none;"></video>
+      <div id="errorBox" class="error-box" style="display:none;">
+        Không tải được video sạch lúc này.
+        <button id="btnRetry" class="btn btn-orange btn-sm">Thử tải video</button>
+      </div>
+    </div>
+
+    <aside class="side-panel">
+      <div class="icon-col">
+        <div class="icon-item">❤️<span id="sLikes">—</span></div>
+        <div class="icon-item">💬<span id="sComments">—</span></div>
+        <div class="icon-item">🔖<span id="sSaves">—</span></div>
+        <div class="icon-item">↗️<span id="sShares">—</span></div>
+      </div>
+
+      <div class="info-panel">
+        <div class="author-row">
+          <div class="avatar" id="authorAvatar">?</div>
+          <div id="authorName">@—</div>
+        </div>
+        <div class="desc" id="vDesc">—</div>
+        <div class="music">♫ original sound</div>
+        <div class="meta">Lượt xem: <b id="vViews">—</b></div>
+        <div class="meta-dim" id="vFetchedAt">Dữ liệu TikWM: —</div>
+
+        <div class="product-box">
+          <div class="product-title">Sản phẩm trong clip</div>
+          <div class="product-empty">Chưa lấy được link sản phẩm – TikTok chưa cung cấp dữ liệu sản phẩm, hãy mở TikTok để xem.</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="bottom-actions">
+    <button id="btnRetry2" class="btn btn-ghost">Thử tải video</button>
+    <a id="btnOpenTikTok" class="btn btn-pink" href="#" target="_blank" rel="noopener">Mở TikTok để tương tác ↗</a>
+  </div>
+
+  <div class="source-note">Nguồn video: TikWM / Tikmate. Số liệu là ảnh chụp tại thời điểm lấy dữ liệu.</div>
+
+  <script src="viewer.js"></script>
+</body>
+</html>

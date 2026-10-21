@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>Quangg Ving Scanner Pro - Ảnh sản phẩm</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="images.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>🖼️ Ảnh <span class="accent-orange">sản phẩm</span></h1>
+    <div class="topbar-right">
+      <button id="btnBackDash" class="btn btn-ghost btn-sm">← Về Dashboard clip</button>
+    </div>
+  </header>
+
+  <section class="img-input">
+    <div class="note-card" id="khoBox" style="margin:0 0 10px">
+      <b>Kết nối với Bảng điều khiển (kho ảnh trên laptop)</b><br>
+      <span style="font-size:12px">Link sếp dán trong bảng điều khiển sẽ được tiện ích này tự tải ảnh về thư mục <b>1 - ẢNH SẢN PHẨM CẦN SẾP XỬ LÍ</b>. Nhập một lần:</span>
+      <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+        <input id="khoUrl" type="text" placeholder="http://localhost:8800" style="flex:2;min-width:180px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg-1);color:var(--text)">
+        <input id="khoKey" type="text" placeholder="mật khẩu (key) in trong cửa sổ đen" style="flex:2;min-width:180px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg-1);color:var(--text)">
+        <button id="khoSave" class="btn btn-orange btn-sm">Lưu và kiểm tra</button>
+      </div>
+      <div id="khoStat" style="font-size:12px;margin-top:6px;color:var(--text-dim)">chưa kết nối</div>
+    </div>
+    <textarea id="linkBox" rows="4" placeholder="Dán link sản phẩm TikTok Shop vào đây (mỗi dòng một link, link dài cũng được)…"></textarea>
+    <div class="img-actions">
+      <button id="btnGet" class="btn btn-orange">⬇ Lấy ảnh</button>
+      <button id="btnResume" class="btn btn-pink" style="display:none;">▶ Tiếp tục (đã xác minh xong)</button>
+      <button id="btnStopImg" class="btn btn-ghost" style="display:none;">⏹ Dừng</button>
+    </div>
+  </section>
+  <div class="note-card" id="imgStatus">Dán link rồi bấm "Lấy ảnh". Tool lấy ảnh từ TikToday trước; mã nào TikToday không có thì mở link TikTok Shop.</div>
+
+  <div id="imgRows"></div>
+  <div id="imgEmpty" class="empty-state" style="display:none;">Chưa có sản phẩm nào.</div>
+
+  <div class="export-bar">
+    <span id="exportInfo"></span>
+    <button id="btnClear" class="btn btn-ghost">Xóa hết</button>
+    <select id="sizeSel" title="Kích thước ảnh khi sao chép mã (nhỏ hơn thì đoạn mã ngắn hơn, dán nhanh hơn)">
+      <option value="640">Ảnh nhỏ gọn (640px)</option>
+      <option value="800">Ảnh lớn (800px)</option>
+    </select>
+    <button id="btnCopy" class="btn btn-pink">📋 Sao chép mã</button>
+    <button id="btnExport" class="btn btn-orange">⬆ Xuất JSON cho app Phối Đồ</button>
+  </div>
+
+  <div id="copyFallback" style="display:none;padding:0 24px 90px;">
+    <div class="note-card">Chrome không cho tự sao chép. Bấm vào ô dưới, nhấn Ctrl+A rồi Ctrl+C, sau đó dán vào ô "📋 Dán mã" trong app Phối Đồ.</div>
+    <textarea id="copyBox" rows="6" style="width:100%;box-sizing:border-box;font-size:11px;"></textarea>
+  </div>
+  <script src="images.js"></script>
+</body>
+</html>
