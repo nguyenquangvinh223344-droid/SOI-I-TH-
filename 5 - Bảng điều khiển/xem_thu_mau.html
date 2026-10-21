@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Xem thử bảng màu và bố cục</title>
+<style>
+  :root { --bg:#f6f5f0; --card:#fffefb; --line:#e6e4d8; --txt:#2f3a33; --dim:#6f7a72; --cta:#e8833a; --sec:#5b8a72; --ok:#16a34a; --bad:#dc2626; --r:12px; --sh:none; --lc:var(--line); --navbg:var(--card); }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; background:#d9d9d9; font:14px/1.45 system-ui,"Segoe UI",Roboto,sans-serif; }
+  .pick { position:sticky; top:0; z-index:50; background:#222; color:#fff; padding:8px 12px; display:flex; gap:6px; flex-wrap:wrap; align-items:center; font-size:13px; }
+  .pick button { border:0; border-radius:8px; padding:7px 11px; font:inherit; cursor:pointer; background:#444; color:#fff; } .pick button.on { background:#fff; color:#111; font-weight:700; }
+  .pick .sp { flex:1; min-width:10px; } .pick .lab { opacity:.7; margin-left:6px; }
+  .stage { display:flex; gap:24px; justify-content:center; align-items:flex-start; padding:18px 12px 40px; flex-wrap:wrap; }
+  .col h4 { margin:0 0 6px; text-align:center; font-size:13px; color:#333; }
+  .lap { width:min(780px,96vw); height:760px; border-radius:14px; overflow:auto; border:1px solid #bbb; }
+  .phone { width:390px; max-width:96vw; height:780px; border-radius:34px; border:9px solid #1d1d1d; overflow:hidden; position:relative; }
+  .phone .scr { position:absolute; inset:0; overflow:auto; padding-bottom:78px; }
+  .scr, .lapin { background:var(--bg); color:var(--txt); transition:background .25s,color .25s; }
+  .lapin { min-height:100%; padding-bottom:20px; }
+
+  /* ===== BỐ CỤC CŨ (giống app hiện tại) ===== */
+  .hd { padding:12px 14px; border-bottom:1px solid var(--line); } .hd b { font-size:16px; display:block; margin-bottom:6px; }
+  .chips { display:flex; gap:6px; flex-wrap:wrap; font-size:11px; } .chip { background:var(--card); border:1px solid var(--lc); border-radius:99px; padding:3px 9px; color:var(--dim); }
+  .main { padding:12px 14px; }
+  .tabsrow { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+  .tab { padding:8px 12px; border-radius:10px; border:1px solid var(--lc); background:var(--card); font-weight:600; font-size:13px; } .tab.on { background:var(--sec); border-color:var(--sec); color:#fff; }
+  .filt { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+  .bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+  .btn { border:1px solid var(--lc); background:var(--card); color:var(--txt); border-radius:10px; padding:9px 12px; font:inherit; font-size:13px; font-weight:600; cursor:pointer; box-shadow:var(--sh); transition:all .2s; }
+  .btn.cta { background:var(--cta); border-color:var(--cta); color:#fff; } .btn.ok { background:var(--ok); border-color:var(--ok); color:#fff; } .btn.bad { color:var(--bad); }
+  .btn.tl { width:50px; height:40px; padding:0; font-size:20px; display:inline-flex; align-items:center; justify-content:center; }
+  .btn.sm { padding:6px 9px; font-size:12px; }
+  .crumb { font-size:13px; color:var(--dim); margin-bottom:10px; } .crumb b { color:var(--txt); }
+  h2 { font-size:14px; margin:14px 0 8px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; }
+  .card { background:var(--card); border:1px solid var(--lc); border-radius:var(--r); box-shadow:var(--sh); overflow:hidden; }
+  .folder { display:flex; align-items:center; gap:10px; padding:14px 12px; border-left:6px solid var(--fc); }
+  .folder .e { font-size:30px; line-height:1; } .folder .tile { width:44px; height:44px; border-radius:14px; display:inline-flex; align-items:center; justify-content:center; flex:none; color:var(--fc); background:color-mix(in srgb,var(--fc) 15%,var(--card)); } .folder b { font-size:14px; } .folder small { display:block; color:var(--dim); font-size:11px; } .folder .go { display:none; }
+  .prod .img { aspect-ratio:3/4; background:linear-gradient(135deg,#e6dfd0,#f3eee4); display:flex; align-items:center; justify-content:center; font-size:34px; } .prod .t { padding:7px 8px; font-size:12px; } .prod .t small { display:block; color:var(--dim); }
+  .st { display:inline-block; font-size:10px; font-weight:700; padding:2px 8px; border-radius:99px; background:var(--sec); color:#fff; margin-bottom:3px; }
+  .fold { background:var(--card); border:1px solid var(--lc); border-radius:10px; padding:8px 10px; margin-bottom:10px; font-size:12px; color:var(--dim); } .fold summary { cursor:pointer; font-weight:600; color:var(--txt); }
+  .nav { display:flex; background:var(--navbg); border-top:1px solid var(--line); }
+  .phone .nav { position:absolute; left:0; right:0; bottom:0; z-index:4; }
+  .lapin .nav { margin-top:16px; }
+  .nav span { flex:1; text-align:center; padding:9px 2px 11px; font-size:11px; color:var(--dim); } .nav span i { display:block; font-style:normal; font-size:20px; } .nav span.on { color:var(--sec); font-weight:700; }
+
+  /* ===== BỐ CỤC MỚI (v2) ===== */
+  .v2 { --r:16px; --lc:color-mix(in srgb,var(--line) 55%,transparent); --sh:0 1px 2px rgba(40,40,30,.05),0 6px 18px rgba(40,40,30,.06); }
+  .v2 .hd { padding:14px 16px 10px; border:0; } .v2 .hd b { font-size:18px; margin-bottom:8px; }
+  .v2 .chips { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; margin:0 -16px; padding:0 16px; } .v2 .chips::-webkit-scrollbar { display:none; } .v2 .chip { white-space:nowrap; padding:5px 11px; font-size:12px; }
+  .v2 .main { padding:6px 16px 16px; }
+  .v2 .tabsrow { display:none; }
+  .v2 .filt { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; margin:0 -16px 14px; padding:2px 16px; } .v2 .filt::-webkit-scrollbar { display:none; }
+  .v2 .filt .btn { white-space:nowrap; border-radius:99px; padding:8px 14px; }
+  .v2 .bar { gap:10px; margin-bottom:16px; } .v2 .btn { border-radius:12px; min-height:44px; padding:10px 14px; } .v2 .btn.tl { width:56px; height:48px; } .v2 .btn.sm { min-height:36px; }
+  .v2 .crumb { margin-bottom:6px; font-size:12px; }
+  .v2 h2 { font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--dim); margin:22px 0 10px; }
+  .v2 .grid { gap:14px; }
+  .v2 .phone .grid, .phone.v2 .grid { grid-template-columns:repeat(2,1fr); }
+  .phone.v2 .grid.fl { grid-template-columns:1fr; gap:10px; }
+  .v2 .folder { padding:14px 16px; gap:14px; min-height:64px; background:color-mix(in srgb,var(--fc) 7%,var(--card)); }
+  .phone.v2 .folder .go { display:block; margin-left:auto; color:var(--dim); font-size:22px; }
+  .v2 .prod .t { padding:10px 12px 12px; font-size:13px; line-height:1.4; }
+  .v2 .fold { border-radius:14px; padding:12px 14px; margin-bottom:14px; }
+  .v2 .nav { box-shadow:0 -4px 16px rgba(40,40,30,.06); border-top:0; } .v2 .nav span { padding:10px 2px 14px; font-size:11px; } .v2 .nav span.on { color:var(--sec); }
+  .v2 .nav span.on i { background:color-mix(in srgb,var(--sec) 14%,transparent); border-radius:99px; width:46px; margin:0 auto 2px; }
+  .v2 .btn:active,.v2 .card:active { transform:scale(.985); }
+  .note { font-size:12px; color:#555; text-align:center; max-width:600px; margin:0 auto 24px; padding:0 12px; }
+</style></head>
+<body>
+<div class="pick" id="pick"></div>
+<div class="stage">
+  <div class="col"><h4>💻 Laptop</h4><div class="lap"><div class="lapin" id="lap"></div></div></div>
+  <div class="col"><h4>📱 Điện thoại (rộng 390)</h4><div class="phone" id="phoneBox"><div class="scr" id="ph"></div></div></div>
+</div>
+<div class="note">Trang xem thử, chưa phải app thật. Bên điện thoại kéo lên xuống được như thật. Bấm "Bố cục" ở thanh đen để so sánh cũ và mới.</div>
+<script>
+  const T = {
+    cur: ['Hiện tại', { '--bg':'#faf3e8','--card':'#fffdf8','--line':'#e6d3b3','--txt':'#3b2a1a','--dim':'#8a735a','--cta':'#ea7c2f','--sec':'#ea7c2f','--navbg':'#fff6e6' }],
+    A: ['A Kem sữa + sage', { '--bg':'#f6f5f0','--card':'#fffefb','--line':'#e6e4d8','--txt':'#2f3a33','--dim':'#6f7a72','--cta':'#e8833a','--sec':'#5b8a72','--navbg':'#fffefb' }],
+    E: ['E Mocha latte', { '--bg':'#f7f3ee','--card':'#fffdfa','--line':'#e8dfd4','--txt':'#3a322b','--dim':'#7d7266','--cta':'#b8734a','--sec':'#8c6a50','--navbg':'#fffdfa' }],
+    F: ['F Bạc hà', { '--bg':'#f2f8f5','--card':'#ffffff','--line':'#d9e9e1','--txt':'#1f3a30','--dim':'#5f7a6e','--cta':'#2f9e75','--sec':'#2f9e75','--navbg':'#ffffff' }],
+    G: ['G Xanh navy dịu', { '--bg':'#f4f6fa','--card':'#ffffff','--line':'#dfe4ee','--txt':'#1f2a44','--dim':'#6b7692','--cta':'#e0902c','--sec':'#3a4f86','--navbg':'#ffffff' }],
+    H: ['H Hồng đào', { '--bg':'#fbf5f3','--card':'#ffffff','--line':'#f0e1dc','--txt':'#3d2b2b','--dim':'#8c7270','--cta':'#e07a6a','--sec':'#c9806f','--navbg':'#ffffff' }],
+    B: ['B Sương sớm', { '--bg':'#f3f7f8','--card':'#ffffff','--line':'#dde7ea','--txt':'#22313a','--dim':'#66798a','--cta':'#3b8f9b','--sec':'#3b8f9b','--navbg':'#ffffff' }],
+    C: ['C Lavender', { '--bg':'#f6f4fa','--card':'#ffffff','--line':'#e6e1f0','--txt':'#2d2a3a','--dim':'#756f8c','--cta':'#7c6bb3','--sec':'#7c6bb3','--navbg':'#ffffff' }],
+    N2: ['N2 Tối tông tím', { '--bg':'#1b1a24','--card':'#25232f','--line':'#37344a','--txt':'#ebe9f5','--dim':'#9d98b5','--cta':'#e8833a','--sec':'#a090e0','--navbg':'#221f2c' }],
+    N: ['N Tối dịu (ban đêm)', { '--bg':'#1e2220','--card':'#272c2a','--line':'#3a413e','--txt':'#e9ece8','--dim':'#9aa39d','--cta':'#e8833a','--sec':'#7fb69a','--navbg':'#242927' }]
+  };
+  // bộ icon riêng: cùng lưới 24px, nét 1.8, đầu tròn, vẽ bằng SVG nên iPhone hay laptop đều hiện y hệt, không phụ thuộc emoji hệ thống
+  const P = {
+    box: '<path d="M12 3l8 4v10l-8 4-8-4V7z"/><path d="M4 7l8 4 8-4M12 11v10"/>',
+    shirt: '<path d="M8.5 4L3 7l2 4 3-1.2V20h8v-10.2L19 11l2-4-5.5-3a3.5 3.5 0 0 1-7 0z"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/>',
+    film: '<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M3 11.5h18M7 7l3-4M13 7l3-4"/>',
+    done: '<circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/>',
+    link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+    folderPlus: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 11v5M9.5 13.5h5"/>',
+    upload: '<path d="M12 16V4m0 0L8 8m4-4 4 4M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>',
+    select: '<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/>',
+    grid: '<rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/>',
+    video: '<rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3z"/>',
+    send: '<path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/>'
+  };
+  let ico = 'svg';
+  const svg = (k, s) => '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + P[k] + '</svg>';
+  const fi = (emo, k) => ico === 'svg' ? '<span class="tile">' + svg(k, 24) + '</span>' : '<span class="e">' + emo + '</span>';
+  const ti = (emo, k) => ico === 'svg' ? svg(k, 22) : emo;
+  const ni = (emo, k) => ico === 'svg' ? svg(k, 24) : emo;
+  const screen = () => `
+    <div class="hd"><b>Bảng điều khiển <span style="color:var(--cta)">·</span> dây chuyền</b>
+      <div class="chips"><span class="chip">🟢 Laptop nối</span><span class="chip">🟢 Canvas nối</span><span class="chip">⚪ Motion Control</span><span class="chip">3 ảnh chờ duyệt</span></div></div>
+    <div class="main">
+      <div class="tabsrow"><span class="tab on">Kho ảnh</span><span class="tab">Phối đồ</span><span class="tab">Duyệt</span><span class="tab">Video</span><span class="tab">Kết quả</span></div>
+      <div class="filt"><button class="btn sm cta">Tất cả (3)</button><button class="btn sm">Mới (1)</button><button class="btn sm">Đã chọn ảnh (1)</button><button class="btn sm">Cất để sau (0)</button><button class="btn sm">Đã phối (1)</button><button class="btn sm">Bỏ (0)</button></div>
+      <details class="fold"><summary>🟢 Canvas đã nối · chờ làm video: 3 ảnh</summary>Tab Chrome đang nối app: 1</details>
+      <div class="bar"><button class="btn tl cta">${ti('🔗', 'link')}</button><button class="btn tl">${ti('📁', 'folderPlus')}</button><button class="btn tl" style="border-color:#6b7d3a;color:#6b7d3a">${ti('🎬', 'film')}</button><button class="btn tl">${ti('⬆', 'upload')}</button><button class="btn tl">${ti('☑', 'select')}</button></div>
+      <div class="crumb">🏠 Kho › <b>Kho</b></div>
+      <h2>Thư mục</h2>
+      <div class="grid fl">
+        <div class="card folder" style="--fc:#ea7c2f">${fi('📦', 'box')}<div><b>1 - ẢNH SẢN PHẨM</b><small>12 sản phẩm</small></div><span class="go">›</span></div>
+        <div class="card folder" style="--fc:#c2573a">${fi('🏂', 'shirt')}<div><b>2 - ĐÃ PHỐI ĐỒ XONG</b><small>86 ảnh</small></div><span class="go">›</span></div>
+        <div class="card folder" style="--fc:#a8742a">${fi('🧍', 'user')}<div><b>3 - KHO MODEL</b><small>40 ảnh</small></div><span class="go">›</span></div>
+        <div class="card folder" style="--fc:#6b7d3a">${fi('🎬', 'film')}<div><b>4 - KHO VIDEO MẪU</b><small>7 video</small></div><span class="go">›</span></div>
+      </div>
+      <h2>Sản phẩm (3)</h2>
+      <div class="grid">
+        <div class="card prod"><div class="img">👗</div><div class="t"><span class="st">Mới</span><br><b>Váy hoa nhí</b><small>0/4 ảnh được chọn</small></div></div>
+        <div class="card prod"><div class="img">👚</div><div class="t"><span class="st">Đã chọn ảnh</span><br><b>Áo sơ mi trắng</b><small>2/5 ảnh được chọn</small></div></div>
+        <div class="card prod"><div class="img">👖</div><div class="t"><span class="st">Đã phối</span><br><b>Quần ống rộng</b><small>3/3 ảnh được chọn</small></div></div>
+        <div class="card prod"><div class="img">🧥</div><div class="t"><span class="st">Mới</span><br><b>Áo khoác dạ</b><small>0/6 ảnh được chọn</small></div></div>
+      </div>
+    </div>
+    <div class="nav"><span class="on"><i>${ni('🗂', 'grid')}</i>Kho ảnh</span><span><i>${ni('👗', 'shirt')}</i>Phối đồ</span><span><i>${ni('✅', 'done')}</i>Duyệt</span><span><i>${ni('🎞', 'video')}</i>Video</span><span><i>${ni('📤', 'send')}</i>Kết quả</span></div>`;
+  const pick = document.getElementById('pick'); let cur = 'C', v2 = true, lastDark = 'N';
+  function paint() {
+    Object.entries(T[cur][1]).forEach(([k, v]) => document.documentElement.style.setProperty(k, v));
+    document.getElementById('lap').innerHTML = screen(); document.getElementById('ph').innerHTML = screen();
+    document.getElementById('lap').classList.toggle('v2', v2); document.getElementById('phoneBox').classList.toggle('v2', v2);
+    document.getElementById('ph').classList.toggle('v2', v2);
+    const isDark = cur === 'N' || cur === 'N2';
+    pick.innerHTML = '<button id="tgl" style="background:' + (isDark ? '#a090e0' : '#fff') + ';color:' + (isDark ? '#111' : '#111') + ';font-weight:700;padding:7px 14px">' + (isDark ? '🌙 Đang tối' : '☀ Đang sáng') + ' (bấm để đổi)</button><span class="lab">Màu:</span>' + Object.keys(T).map((k) => '<button data-k="' + k + '" class="' + (k === cur ? 'on' : '') + '">' + T[k][0] + '</button>').join('') + '<span class="sp"></span><span class="lab">Icon:</span><button data-i="emo" class="' + (ico === 'emo' ? 'on' : '') + '">Emoji (đang dùng)</button><button data-i="svg" class="' + (ico === 'svg' ? 'on' : '') + '">Vẽ riêng</button><span class="lab">Bố cục:</span><button data-l="0" class="' + (!v2 ? 'on' : '') + '">Cũ</button><button data-l="1" class="' + (v2 ? 'on' : '') + '">Mới</button>';
+    pick.querySelectorAll('[data-k]').forEach((b) => b.onclick = () => { cur = b.dataset.k; paint(); });
+    document.getElementById('tgl').onclick = () => { if (isDark) { cur = 'C'; } else { cur = lastDark; } paint(); };
+    if (isDark) lastDark = cur;
+    pick.querySelectorAll('[data-i]').forEach((b) => b.onclick = () => { ico = b.dataset.i; paint(); });
+    pick.querySelectorAll('[data-l]').forEach((b) => b.onclick = () => { v2 = b.dataset.l === '1'; paint(); });
+  }
+  paint();
+</script>
+</body></html>
